@@ -1,0 +1,115 @@
+/* ---------------------------------------------------------------------------
+ * AI Atlas — design tokens
+ * "Dark intelligence console". See docs/MASTER_PLAN.md → Design system.
+ *
+ * This file defines RAW values only. Tailwind utility mapping lives in
+ * globals.css under @theme. Never hard-code a hex outside this file.
+ * ------------------------------------------------------------------------- */
+
+:root {
+  /* --- Surfaces ------------------------------------------------------- */
+  --bg-base: #07080a;
+  --bg-surface: #0e1014;
+  --bg-raised: #14171c;
+  --bg-overlay: #1a1e24;
+
+  /* --- Text ----------------------------------------------------------- */
+  --text-primary: #e8eaed;
+  --text-secondary: #9ba1a8;
+  --text-tertiary: #6b7178;
+  --text-inverse: #07080a;
+
+  /* --- Borders -------------------------------------------------------- */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(76, 201, 240, 0.4);
+
+  /* --- Interactive accent (UI only — never encode data in this) -------- */
+  --accent: #4cc9f0;
+  --accent-muted: #2a7f9e;
+  --accent-glow: rgba(76, 201, 240, 0.15);
+
+  /* --- Semantic ------------------------------------------------------- */
+  --positive: #34d399;
+  --negative: #f87171;
+  --warning: #fbbf24;
+
+  /* --- No data: a first-class state, always present in legends -------- */
+  --no-data: #22262c;
+  --no-data-text: #4a5058;
+
+  /* --- Layer ramps ----------------------------------------------------
+   * One sequential ramp per globe layer so each layer reads differently
+   * at a glance. 5 stops, monotonically increasing lightness, each
+   * validated >=3:1 against --bg-base at the light end.
+   * Coverage noted per layer (see MASTER_PLAN → Data sources).
+   * ------------------------------------------------------------------- */
+
+  /* Adoption — teal→cyan. 147 countries. */
+  --ramp-adoption-1: #0b3b3f;
+  --ramp-adoption-2: #12595e;
+  --ramp-adoption-3: #1a7f82;
+  --ramp-adoption-4: #2fa8a4;
+  --ramp-adoption-5: #5ee0d0;
+
+  /* Investment — amber. 119 countries. */
+  --ramp-investment-1: #3d2708;
+  --ramp-investment-2: #6b4310;
+  --ramp-investment-3: #a0661a;
+  --ramp-investment-4: #d18f28;
+  --ramp-investment-5: #f5b944;
+
+  /* Development — violet. 35 countries; mostly no-data by design. */
+  --ramp-development-1: #2a1b45;
+  --ramp-development-2: #45296e;
+  --ramp-development-3: #634095;
+  --ramp-development-4: #8760be;
+  --ramp-development-5: #b08ce8;
+
+  /* Research — green. 189 countries. */
+  --ramp-research-1: #10331c;
+  --ramp-research-2: #1a5730;
+  --ramp-research-3: #277f45;
+  --ramp-research-4: #3baa5f;
+  --ramp-research-5: #63d683;
+
+  /* --- Motion ---------------------------------------------------------
+   * One easing curve everywhere. Durations are semantic, not arbitrary.
+   * ------------------------------------------------------------------- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-instant: 100ms;
+  --dur-ui: 180ms;
+  --dur-ui-slow: 250ms;
+  --dur-panel: 350ms;
+  --dur-count: 600ms;
+  --dur-camera: 1100ms;
+
+  /* --- Type scale ----------------------------------------------------- */
+  --text-2xs: 0.6875rem; /* 11 — table micro-labels */
+  --text-xs: 0.75rem; /* 12 — captions, legends */
+  --text-sm: 0.875rem; /* 14 — body small, table cells */
+  --text-base: 1rem; /* 16 — body */
+  --text-lg: 1.25rem; /* 20 — subheads */
+  --text-xl: 1.75rem; /* 28 — section titles */
+  --text-2xl: 2.5rem; /* 40 — page titles */
+  --text-3xl: 4rem; /* 64 — hero figures */
+
+  /* --- Layout --------------------------------------------------------- */
+  --radius-sm: 2px;
+  --radius: 4px;
+  --radius-lg: 8px;
+  --shell-max: 1440px;
+}
+
+/* Reduced motion: collapse every duration to near-zero at the token level,
+ * so components inherit correct behaviour without individual media queries. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 1ms;
+    --dur-ui: 1ms;
+    --dur-ui-slow: 1ms;
+    --dur-panel: 1ms;
+    --dur-count: 1ms;
+    --dur-camera: 1ms;
+  }
+}
