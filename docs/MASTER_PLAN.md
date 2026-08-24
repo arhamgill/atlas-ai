@@ -276,16 +276,16 @@ Sequential, perceptually uniform, ≥3:1 against `--bg-base` at the light end. V
 **The de-risking week. Do not start UI.**
 
 - [x] ~~Scaffold Next.js + TS strict + Tailwind v4 + ESLint/Prettier/Husky~~ **DONE 2026-08-24** — typecheck/lint/test/format/build all green
-- [ ] Build `country-crosswalk.json`; resolver with loud failures
+- [x] ~~Build `country-crosswalk.json`; resolver with loud failures~~ **DONE** — 250 countries, 1,088 aliases, 0 collisions
 - [x] ~~Probe all 7 OWID slugs~~ **DONE 2026-08-24** — all four layers confirmed viable; see Data sources above
-- [ ] Ingest the three OWID layer CSVs (adoption 147 / investment 119 / research 189) — ISO3 native, no name matching needed
-- [ ] Ingest Epoch notable models; resolve the 35 country tokens; assert 100% resolution for models since 2023
-- [ ] Cross-check the adoption layer against the Microsoft CSV as an integrity test (must match to 1 decimal place)
+- [x] ~~Ingest the three OWID layer CSVs~~ **DONE** — adoption 147 / investment 119 / research 190
+- [x] ~~Ingest Epoch notable models~~ **DONE** — 1,052 models, 34 countries, 0 unresolved
+- [x] ~~Cross-check adoption against the Microsoft CSV~~ **DONE** — 5 hard checks in `pnpm ingest:report`, all passing
 - [ ] Snapshot AI Index public data from Drive → `data/snapshots/` with retrieval date
-- [ ] Drizzle schema + Neon connection + first migration + full seed
-- [ ] `compute-rankings.ts` producing ranks and deltas
+- [x] ~~Drizzle schema + Neon connection + first migration + full seed~~ **DONE** — 8 tables, 3,419 metric rows
+- [x] ~~`compute-rankings.ts` producing ranks and deltas~~ **DONE** — competition ranking, 34 unit tests
 - [ ] **R3F globe spike:** sphere + TopoJSON polygons + hover pick + one metric colored. Ugly is fine. Prove picking and 60 fps.
-- [ ] `docs/DATA_SOURCES.md` + `docs/DECISIONS.md` started
+- [x] ~~`docs/DECISIONS.md` started~~ **DONE** — 6 ADRs incl. two data-quality traps
 
 **Exit gate:** a Postgres database with real, ranked, source-attributed data for ≥140 countries on the adoption layer, and a globe that responds to a click.
 

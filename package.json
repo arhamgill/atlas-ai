@@ -17,10 +17,11 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "ingest": "tsx scripts/ingest/seed.ts",
-    "ingest:report": "tsx scripts/ingest/report.ts",
-    "ingest:discover": "tsx scripts/ingest/discover.ts",
-    "prepare": "husky"
+    "ingest": "tsx --env-file=.env.local scripts/ingest/seed.ts",
+    "ingest:report": "tsx --env-file=.env.local scripts/ingest/report.ts",
+    "ingest:discover": "tsx --env-file=.env.local scripts/ingest/discover.ts",
+    "prepare": "husky",
+    "ingest:crosswalk": "tsx --env-file=.env.local scripts/ingest/build-crosswalk.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

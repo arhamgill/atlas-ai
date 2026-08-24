@@ -19,9 +19,12 @@ updated as work lands.
 
 ## Current state
 
-**V0 — Foundation.** Scaffold complete: Next 16.3.2 / React 19.2.8 / Tailwind v4 / TS strict.
-Design tokens wired and verified. Data sources probed and confirmed.
-Next up: the ingest pipeline (`scripts/ingest/`), then the R3F globe spike.
+**V0 — Foundation.** Scaffold + full ingest pipeline complete. Neon Postgres holds
+3,419 metric rows / 3,419 rankings / 1,052 models across 194 countries, all integrity
+checks passing. Remaining V0 item: the R3F globe spike.
+
+Read [docs/DECISIONS.md](docs/DECISIONS.md) before changing the schema or the ingest —
+it records why things are the way they are, including two data-quality traps.
 
 ## Commands
 
@@ -33,7 +36,11 @@ Next up: the ingest pipeline (`scripts/ingest/`), then the R3F globe spike.
 | `pnpm lint` / `pnpm format`                     | ESLint / Prettier                                                                      |
 | `pnpm test`                                     | Vitest                                                                                 |
 | `pnpm ingest`                                   | Fetch → validate → resolve → upsert into Postgres                                      |
-| `pnpm ingest:report`                            | Coverage %, unmatched names, null rates                                                |
+| `pnpm ingest -- --dry-run`                      | Fetch + resolve + report, write nothing                                                |
+| `pnpm ingest -- --offline`                      | Rebuild from committed snapshots, no network                                           |
+| `pnpm ingest:crosswalk`                         | Regenerate `data/seed/country-crosswalk.json`                                          |
+| `pnpm ingest:report`                            | Post-ingest verification incl. hard integrity checks                                   |
+| `pnpm ingest:discover -- "terms"`               | Find country-level OWID charts (never guess slugs)                                     |
 | `pnpm db:generate` / `db:migrate` / `db:studio` | Drizzle                                                                                |
 | `pnpm analyze`                                  | Bundle analyzer                                                                        |
 
@@ -54,7 +61,7 @@ Four globe layers, all confirmed country-level:
 | ----------- | --------------------------------------------------------------- | --------- | --------------------------- |
 | Adoption    | OWID `estimated-share-people-generative-ai`                     | 147       | 3 (2025-06-30 → 2026-03-31) |
 | Investment  | OWID `private-investment-in-artificial-intelligence-cset`       | 119       | 10 (2016–2025)              |
-| Research    | OWID `annual-scholarly-publications-on-artificial-intelligence` | 189       | 9 (2016–2024)               |
+| Research    | OWID `annual-scholarly-publications-on-artificial-intelligence` | 190       | 9 (2016–2024)               |
 | Development | Epoch AI `notable_ai_models.csv`                                | 35        | by publication date         |
 
 - OWID CSV pattern: `https://ourworldindata.org/grapher/{slug}.csv?csvType=full`
@@ -64,8 +71,14 @@ Four globe layers, all confirmed country-level:
   needs resolution (35 official ISO 3166 names).
 - **There is no country-level AI-patent dataset.** `annual-patent-applications` is all
   patents, not AI. Do not present it as an AI metric.
-- Discovery for new layers: `https://ourworldindata.org/api/search?q=<term>` returns
-  `availableEntities` per chart — check it for real country names.
+- Discovery for new layers: `pnpm ingest:discover -- "<terms>"` (wraps OWID's search
+  API and reports which charts are country-level). Never hand-guess a slug.
+- **Adoption values are modelled and regionally imputed.** 12 West African countries
+  share exactly 10.1%; the four Guianas share exactly 10.3%. Rank movement inside those
+  blocks is a model artefact, not a national trend — see DECISIONS 005 before building
+  "Fastest Rising".
+- Kosovo (`UNK`) has no ISO numeric code: present in tables and rankings, not pickable
+  on the globe. Never fabricate a numeric code to make it fit.
 
 See MASTER_PLAN → Data sources for the full list including global-only slugs (Trends charts)
 and per-model slugs (V3).

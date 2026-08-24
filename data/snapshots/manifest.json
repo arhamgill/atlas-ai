@@ -1,0 +1,22 @@
+{
+  "estimated-share-people-generative-ai": {
+    "url": "https://ourworldindata.org/grapher/estimated-share-people-generative-ai.csv?csvType=full",
+    "retrievedAt": "2026-08-24T19:13:42.825Z",
+    "bytes": 20313
+  },
+  "private-investment-in-artificial-intelligence-cset": {
+    "url": "https://ourworldindata.org/grapher/private-investment-in-artificial-intelligence-cset.csv?csvType=full",
+    "retrievedAt": "2026-08-24T19:13:43.004Z",
+    "bytes": 23976
+  },
+  "annual-scholarly-publications-on-artificial-intelligence": {
+    "url": "https://ourworldindata.org/grapher/annual-scholarly-publications-on-artificial-intelligence.csv?csvType=full",
+    "retrievedAt": "2026-08-24T19:13:43.163Z",
+    "bytes": 35837
+  },
+  "epoch-notable-ai-models": {
+    "url": "https://epoch.ai/data/notable_ai_models.csv",
+    "retrievedAt": "2026-08-24T19:13:46.062Z",
+    "bytes": 2232175
+  }
+}

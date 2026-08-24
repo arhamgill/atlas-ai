@@ -1,0 +1,1 @@
+ALTER TABLE "countries" ALTER COLUMN "iso_numeric" DROP NOT NULL;
