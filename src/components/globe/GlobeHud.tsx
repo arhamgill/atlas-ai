@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { GlobeLayer } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
@@ -27,6 +27,31 @@ export function GlobeHud({ layers, countries }: Props) {
   const selected = useGlobeStore((s) => s.selected);
   const setSelected = useGlobeStore((s) => s.setSelected);
   const pointer = useGlobeStore((s) => s.pointer);
+
+  const sectionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Switching layers while the panel is open used to change only a faint
+  // background, and the relevant section could be scrolled out of sight
+  // entirely — so the figures appeared not to respond at all. Bring it into
+  // view whenever the active layer changes.
+  useEffect(() => {
+    if (!selected) return;
+    const el = sectionRefs.current[layerIndex];
+    const scroller = el?.parentElement;
+    if (!el || !scroller) return;
+
+    // Leave it alone if it is already fully visible — scrolling a section that
+    // the user can already see is just noise.
+    const view = scroller.getBoundingClientRect();
+    const box = el.getBoundingClientRect();
+    if (box.top >= view.top - 2 && box.bottom <= view.bottom + 2) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // "start", not "nearest": nearest scrolls the minimum possible amount and
+    // can leave a tall section still clipped. Pinning the active layer to the
+    // top of the list makes where to look unambiguous.
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }, [layerIndex, selected]);
 
   const nameByIso3 = useMemo(
     () => new Map(countries.map((c) => [c.iso3, c])),
@@ -64,25 +89,30 @@ export function GlobeHud({ layers, countries }: Props) {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setLayer(i)}
-                className="group relative shrink-0 rounded-[var(--radius)] px-2 py-1.5 text-left transition-colors sm:px-4 sm:py-2"
-                style={{
-                  background: isActive ? "var(--bg-raised)" : "transparent",
-                  transitionDuration: "var(--dur-ui)",
-                  transitionTimingFunction: "var(--ease)",
-                }}
+                className="group relative shrink-0 rounded-[var(--radius)] px-2 py-1.5 text-left sm:px-4 sm:py-2"
               >
+                {/* Slides between tabs instead of each one flicking its own
+                    background on and off, so the change is something you see
+                    happen rather than something you have to notice. */}
+                {isActive && (
+                  <motion.span
+                    layoutId="switcher-active-tab"
+                    className="absolute inset-0 rounded-[var(--radius)] bg-[var(--bg-raised)]"
+                    transition={{ duration: 0.3, ease: EASE }}
+                  />
+                )}
                 <span
-                  className="block text-[10px] tracking-[0.1em] uppercase sm:text-[11px] sm:tracking-[0.14em]"
+                  className="relative block text-[10px] tracking-[0.1em] uppercase sm:text-[11px] sm:tracking-[0.14em]"
                   style={{
                     color: isActive ? "var(--text-primary)" : "var(--text-tertiary)",
                   }}
                 >
                   {layer.shortLabel}
                 </span>
-                <span className="numeric text-2xs mt-1 block text-[var(--text-tertiary)]">
+                <span className="numeric text-2xs relative mt-1 block text-[var(--text-tertiary)]">
                   {layer.rows.length}
                 </span>
-                <span className="mt-1.5 flex h-0.5 w-full overflow-hidden rounded-full">
+                <span className="relative mt-1.5 flex h-0.5 w-full overflow-hidden rounded-full">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <span
                       key={s}
@@ -214,23 +244,68 @@ export function GlobeHud({ layers, countries }: Props) {
             <div className="flex-1 overflow-y-auto">
               {layers.map((layer, i) => {
                 const row = index[i]?.get(selected);
+                const isActive = i === layerIndex;
                 return (
                   <button
                     key={layer.key}
+                    ref={(el) => {
+                      sectionRefs.current[i] = el;
+                    }}
                     onClick={() => setLayer(i)}
-                    className="block w-full border-b border-[var(--border-subtle)] p-5 text-left transition-colors hover:bg-[var(--bg-raised)]"
+                    aria-current={isActive ? "true" : undefined}
+                    className="relative block w-full border-b border-[var(--border-subtle)] py-5 pr-5 pl-6 text-left transition-colors hover:bg-[var(--bg-raised)]"
                     style={{
-                      background: i === layerIndex ? "var(--bg-raised)" : undefined,
+                      background: isActive ? "var(--bg-raised)" : undefined,
+                      transitionDuration: "var(--dur-ui)",
+                      transitionTimingFunction: "var(--ease)",
                     }}
                   >
+                    {/* One shared bar that slides between sections, so the eye
+                        is carried to the layer that just became active rather
+                        than having to hunt for a changed background. */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="panel-active-layer"
+                        className="absolute inset-y-0 left-0 w-[3px]"
+                        style={{ background: `var(--ramp-${layer.layer}-4)` }}
+                        transition={{ duration: 0.34, ease: EASE }}
+                      />
+                    )}
+
                     <div className="flex items-center gap-2">
                       <span
-                        className="inline-block size-2 rounded-[2px]"
-                        style={{ background: `var(--ramp-${layer.layer}-4)` }}
+                        className="inline-block size-2 rounded-[2px] transition-opacity"
+                        style={{
+                          background: `var(--ramp-${layer.layer}-4)`,
+                          opacity: isActive ? 1 : 0.45,
+                          transitionDuration: "var(--dur-ui)",
+                        }}
                       />
-                      <span className="text-2xs tracking-[0.14em] text-[var(--text-tertiary)] uppercase">
+                      <span
+                        className="text-2xs tracking-[0.14em] uppercase transition-colors"
+                        style={{
+                          color: isActive
+                            ? "var(--text-primary)"
+                            : "var(--text-tertiary)",
+                          transitionDuration: "var(--dur-ui)",
+                        }}
+                      >
                         {layer.shortLabel}
                       </span>
+                      {isActive && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -4 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.22, ease: EASE }}
+                          className="ml-auto rounded-full border px-1.5 py-0.5 text-[9px] tracking-[0.12em] uppercase"
+                          style={{
+                            borderColor: "var(--border-accent)",
+                            color: "var(--accent)",
+                          }}
+                        >
+                          On globe
+                        </motion.span>
+                      )}
                     </div>
 
                     {row ? (
@@ -238,7 +313,15 @@ export function GlobeHud({ layers, countries }: Props) {
                         <AnimatedNumber
                           value={row[1]}
                           format={(v) => formatMetric(v, layer.unit, layer.precision)}
-                          className="numeric mt-2.5 block text-[length:var(--text-xl)] leading-none"
+                          className="numeric mt-2.5 block leading-none transition-all"
+                          style={{
+                            fontSize: isActive ? "var(--text-2xl)" : "var(--text-lg)",
+                            color: isActive
+                              ? "var(--text-primary)"
+                              : "var(--text-secondary)",
+                            transitionDuration: "var(--dur-ui)",
+                            transitionTimingFunction: "var(--ease)",
+                          }}
                         />
                         <p className="numeric text-2xs mt-2 text-[var(--text-tertiary)]">
                           Rank #{row[2]} of {layer.rows.length}

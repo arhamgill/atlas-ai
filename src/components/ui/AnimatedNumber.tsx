@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  type CSSProperties,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -33,9 +39,10 @@ interface Props {
   format: (v: number) => string;
   durationMs?: number;
   className?: string;
+  style?: CSSProperties;
 }
 
-function Counting({ value, format, durationMs = 600, className }: Props) {
+function Counting({ value, format, durationMs = 600, className, style }: Props) {
   const [display, setDisplay] = useState(value);
   const frameRef = useRef<number | null>(null);
   const fromRef = useRef(value);
@@ -65,7 +72,11 @@ function Counting({ value, format, durationMs = 600, className }: Props) {
     };
   }, [value, durationMs]);
 
-  return <span className={className}>{format(display)}</span>;
+  return (
+    <span className={className} style={style}>
+      {format(display)}
+    </span>
+  );
 }
 
 /**
@@ -83,7 +94,11 @@ export function AnimatedNumber(props: Props) {
   const reduced = useReducedMotion();
 
   if (reduced || props.durationMs === 0) {
-    return <span className={props.className}>{props.format(props.value)}</span>;
+    return (
+      <span className={props.className} style={props.style}>
+        {props.format(props.value)}
+      </span>
+    );
   }
   return <Counting {...props} />;
 }
