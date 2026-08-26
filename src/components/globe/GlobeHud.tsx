@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useMemo } from "react";
 import type { GlobeLayer } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { useGlobeStore } from "@/lib/state/globe";
 
 export interface CountryMeta {
@@ -105,9 +106,18 @@ export function GlobeHud({ layers, countries }: Props) {
         <p className="text-2xs tracking-[0.24em] text-[var(--text-tertiary)] uppercase">
           AI Atlas
         </p>
-        <h1 className="mt-1.5 max-w-xs text-[length:var(--text-lg)] leading-[1.15] font-medium tracking-tight sm:mt-2 sm:text-[length:var(--text-xl)]">
-          {active.label}
-        </h1>
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={active.key}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.28, ease: EASE }}
+            className="mt-1.5 max-w-xs text-[length:var(--text-lg)] leading-[1.15] font-medium tracking-tight sm:mt-2 sm:text-[length:var(--text-xl)]"
+          >
+            {active.label}
+          </motion.h1>
+        </AnimatePresence>
         <p className="numeric mt-1.5 text-xs text-[var(--text-tertiary)]">
           {formatPeriod(active.period)} · {active.rows.length} countries
         </p>
@@ -225,9 +235,11 @@ export function GlobeHud({ layers, countries }: Props) {
 
                     {row ? (
                       <>
-                        <p className="numeric mt-2.5 text-[length:var(--text-xl)] leading-none">
-                          {formatMetric(row[1], layer.unit, layer.precision)}
-                        </p>
+                        <AnimatedNumber
+                          value={row[1]}
+                          format={(v) => formatMetric(v, layer.unit, layer.precision)}
+                          className="numeric mt-2.5 block text-[length:var(--text-xl)] leading-none"
+                        />
                         <p className="numeric text-2xs mt-2 text-[var(--text-tertiary)]">
                           Rank #{row[2]} of {layer.rows.length}
                           {row[3] !== null && row[3] !== 0 && (
