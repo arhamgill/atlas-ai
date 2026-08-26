@@ -8,7 +8,6 @@ import * as THREE from "three";
 import type { GlobeLayer } from "@/lib/db/queries";
 import { Atmosphere } from "./Atmosphere";
 import { Halo } from "./Halo";
-import { LeaderMarkers } from "./LeaderMarkers";
 import { CameraRig } from "./CameraRig";
 import { Earth } from "./Earth";
 import { Starfield } from "./Starfield";
@@ -41,7 +40,6 @@ export function GlobeScene({ layers }: { layers: GlobeLayer[] }) {
       <Starfield count={lowPower ? 700 : 1800} />
 
       <Earth layers={layers} />
-      <LeaderMarkers layers={layers} />
 
       {/* One tight shell for the crisp limb, plus a quad-based halo. A second
           shell would draw a hard ring in mid-air at its own radius. */}
