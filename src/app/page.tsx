@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { GlobeExperience } from "@/components/globe/GlobeExperience";
 import { getGlobeCountries, getGlobeLayers } from "@/lib/db/queries";
 
@@ -9,6 +10,16 @@ import { getGlobeCountries, getGlobeLayers } from "@/lib/db/queries";
  * static with ISR, keeping the database off the critical render path.
  */
 export const revalidate = 3600;
+
+function GlobeFallback() {
+  return (
+    <div className="grid h-[100svh] w-full place-items-center bg-[var(--bg-base)]">
+      <p className="numeric text-2xs animate-pulse tracking-[0.24em] text-[var(--text-tertiary)] uppercase">
+        Rendering globe
+      </p>
+    </div>
+  );
+}
 
 export default async function Home() {
   const [layers, countries] = await Promise.all([
@@ -22,5 +33,12 @@ export default async function Home() {
     .filter((c) => present.has(c.iso3))
     .map((c) => ({ iso3: c.iso3, name: c.name, region: c.region }));
 
-  return <GlobeExperience layers={layers} countries={trimmed} />;
+  return (
+    // The globe reads its layer and country from the URL, which means
+    // useSearchParams under the hood. Without this boundary the whole page
+    // opts out of static prerendering and the build fails outright.
+    <Suspense fallback={<GlobeFallback />}>
+      <GlobeExperience layers={layers} countries={trimmed} />
+    </Suspense>
+  );
 }
