@@ -49,11 +49,11 @@ export function GlobeHud({ layers, countries }: Props) {
   return (
     <>
       {/* ---------- Layer switcher ---------- */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-4 sm:p-6">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-2 sm:p-6">
         <div
           role="tablist"
           aria-label="Globe data layer"
-          className="pointer-events-auto flex gap-1 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[color-mix(in_srgb,var(--bg-surface)_82%,transparent)] p-1 backdrop-blur-md"
+          className="pointer-events-auto flex max-w-full [scrollbar-width:none] gap-0.5 overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[color-mix(in_srgb,var(--bg-surface)_82%,transparent)] p-1 backdrop-blur-md sm:gap-1 [&::-webkit-scrollbar]:hidden"
         >
           {layers.map((layer, i) => {
             const isActive = i === layerIndex;
@@ -63,7 +63,7 @@ export function GlobeHud({ layers, countries }: Props) {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setLayer(i)}
-                className="group relative rounded-[var(--radius)] px-3 py-2 text-left transition-colors sm:px-4"
+                className="group relative shrink-0 rounded-[var(--radius)] px-2 py-1.5 text-left transition-colors sm:px-4 sm:py-2"
                 style={{
                   background: isActive ? "var(--bg-raised)" : "transparent",
                   transitionDuration: "var(--dur-ui)",
@@ -71,7 +71,7 @@ export function GlobeHud({ layers, countries }: Props) {
                 }}
               >
                 <span
-                  className="text-2xs block tracking-[0.14em] uppercase"
+                  className="block text-[10px] tracking-[0.1em] uppercase sm:text-[11px] sm:tracking-[0.14em]"
                   style={{
                     color: isActive ? "var(--text-primary)" : "var(--text-tertiary)",
                   }}
@@ -101,11 +101,11 @@ export function GlobeHud({ layers, countries }: Props) {
       </div>
 
       {/* ---------- Title + legend ---------- */}
-      <div className="pointer-events-none absolute top-0 left-0 z-20 p-5 sm:p-8">
+      <div className="pointer-events-none absolute top-0 left-0 z-20 max-w-[78%] bg-[radial-gradient(120%_100%_at_0%_0%,var(--bg-base)_25%,transparent_75%)] p-4 pr-10 pb-10 sm:max-w-none sm:p-8 sm:pr-16">
         <p className="text-2xs tracking-[0.24em] text-[var(--text-tertiary)] uppercase">
           AI Atlas
         </p>
-        <h1 className="mt-2 max-w-xs text-[length:var(--text-xl)] leading-[1.15] font-medium tracking-tight">
+        <h1 className="mt-1.5 max-w-xs text-[length:var(--text-lg)] leading-[1.15] font-medium tracking-tight sm:mt-2 sm:text-[length:var(--text-xl)]">
           {active.label}
         </h1>
         <p className="numeric mt-1.5 text-xs text-[var(--text-tertiary)]">

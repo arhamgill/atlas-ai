@@ -3,7 +3,7 @@
 import { OrbitControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { geoCentroid } from "d3-geo";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { latLngToVector3 } from "@/lib/geo/sphere";
 import { getCountryFeatures } from "@/lib/geo/topology";
@@ -16,8 +16,27 @@ type Controls = {
   target: THREE.Vector3;
 };
 
-/** Where the camera comes to rest. */
-const REST_DISTANCE = 3.55;
+/**
+ * How much of the tighter viewport axis the globe should occupy. Tuned so a
+ * landscape desktop lands at the ~3.55 distance the design was built around.
+ */
+const FILL_FACTOR = 0.818;
+
+/**
+ * Distance at which the globe fits the viewport.
+ *
+ * A fixed distance is only ever right for one aspect ratio. On a tall phone
+ * the limiting dimension is width, and the horizontal field of view is much
+ * narrower than the vertical one — a camera framed for a 16:9 desktop puts the
+ * globe well outside the screen. Framing off whichever axis is tighter keeps
+ * it correct everywhere.
+ */
+function restDistanceFor(aspect: number, fovDeg: number): number {
+  const vFov = (fovDeg * Math.PI) / 180;
+  const hFov = 2 * Math.atan(Math.tan(vFov / 2) * Math.max(aspect, 0.05));
+  const target = Math.min(vFov, hFov) * FILL_FACTOR;
+  return 1 / Math.sin(target / 2);
+}
 /** Where the intro starts: far enough out that the globe reads as small. */
 const INTRO_DISTANCE = 13;
 const INTRO_SECONDS = 2.4;
@@ -47,7 +66,13 @@ function easeInOutCubic(t: number): number {
  */
 export function CameraRig() {
   const controlsRef = useRef<Controls | null>(null);
-  const camera = useThree((s) => s.camera);
+  const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
+  const size = useThree((s) => s.size);
+
+  const restDistance = useMemo(
+    () => restDistanceFor(size.width / size.height, camera.fov ?? 40),
+    [size.width, size.height, camera.fov],
+  );
 
   const selected = useGlobeStore((s) => s.selected);
   const interacted = useGlobeStore((s) => s.interacted);
@@ -68,7 +93,7 @@ export function CameraRig() {
     if (introDone) return;
 
     if (prefersReducedMotion()) {
-      camera.position.set(0, 0.42, REST_DISTANCE);
+      camera.position.setFromSphericalCoords(restDistance, Math.PI / 2 - 0.12, 0);
       finishIntro();
       return;
     }
@@ -77,8 +102,8 @@ export function CameraRig() {
     // longitude — a pure dolly reads as a zoom, not an arrival.
     const from = new THREE.Vector3(-0.55, 0.3, 1)
       .normalize()
-      .multiplyScalar(INTRO_DISTANCE);
-    const to = new THREE.Vector3(0, 0.42, REST_DISTANCE);
+      .multiplyScalar(INTRO_DISTANCE * Math.max(1, restDistance / 3.55));
+    const to = new THREE.Vector3(0, 0.42, 1).normalize().multiplyScalar(restDistance);
 
     introFrom.current.copy(from);
     introTo.current.copy(to);
@@ -88,7 +113,7 @@ export function CameraRig() {
 
     // Controls would fight us for the camera during the flight.
     if (controlsRef.current) controlsRef.current.enabled = false;
-  }, [introDone, camera, finishIntro]);
+  }, [introDone, camera, finishIntro, restDistance]);
 
   // --- Flight to a selected country ---------------------------------------
   useEffect(() => {
@@ -191,6 +216,17 @@ export function CameraRig() {
     // Idle presentation: rotate until the user takes over, then never again.
     controls.autoRotate = !interacted && !selected;
 
+    // Re-frame on resize / orientation change, but only while the user has
+    // not taken control — otherwise this would fight their chosen zoom.
+    if (!interacted && !flying.current) {
+      const d = camera.position.length();
+      if (Math.abs(d - restDistance) > 0.01) {
+        camera.position.setLength(
+          THREE.MathUtils.lerp(d, restDistance, 1 - Math.pow(0.01, delta)),
+        );
+      }
+    }
+
     if (flying.current && flightTarget.current) {
       // Frame-rate independent damping, so the flight feels the same at 60
       // and 144 Hz.
@@ -214,8 +250,8 @@ export function CameraRig() {
       dampingFactor={0.055}
       rotateSpeed={0.42}
       zoomSpeed={0.6}
-      minDistance={1.9}
-      maxDistance={6.0}
+      minDistance={restDistance * 0.55}
+      maxDistance={restDistance * 1.7}
       autoRotateSpeed={0.32}
       onStart={() => {
         flying.current = false;

@@ -11,8 +11,14 @@ import { getCountryFeatures } from "@/lib/geo/topology";
 import { formatMetric } from "@/lib/metrics/scales";
 import { useGlobeStore } from "@/lib/state/globe";
 
-/** How many ranked countries to label. More than this and the globe is noise. */
-const LEADER_COUNT = 5;
+/**
+ * How many ranked countries to label. Past this the pills collide over Europe
+ * and the map stops being readable — and a phone runs out of room far sooner
+ * than a desktop does.
+ */
+function leaderCount(width: number): number {
+  return width < 640 ? 3 : 5;
+}
 
 interface Leader {
   iso3: string;
@@ -22,7 +28,7 @@ interface Leader {
   position: THREE.Vector3;
 }
 
-function useLeaders(layer: GlobeLayer | undefined): Leader[] {
+function useLeaders(layer: GlobeLayer | undefined, count: number): Leader[] {
   return useMemo(() => {
     if (!layer) return [];
     const features = getCountryFeatures();
@@ -30,7 +36,7 @@ function useLeaders(layer: GlobeLayer | undefined): Leader[] {
 
     return [...layer.rows]
       .sort((a, b) => a[2] - b[2])
-      .slice(0, LEADER_COUNT)
+      .slice(0, count)
       .flatMap((row) => {
         const feature = byIso3.get(row[0]);
         if (!feature) return [];
@@ -47,7 +53,7 @@ function useLeaders(layer: GlobeLayer | undefined): Leader[] {
           },
         ];
       });
-  }, [layer]);
+  }, [layer, count]);
 }
 
 function Marker({
@@ -121,8 +127,9 @@ function Marker({
 export function LeaderMarkers({ layers }: { layers: GlobeLayer[] }) {
   const layerIndex = useGlobeStore((s) => s.layerIndex);
   const introDone = useGlobeStore((s) => s.introDone);
+  const size = useThree((s) => s.size);
   const layer = layers[layerIndex];
-  const leaders = useLeaders(layer);
+  const leaders = useLeaders(layer, leaderCount(size.width));
 
   // Holding them back during the opening flight keeps the arrival clean.
   if (!layer || !introDone) return null;
