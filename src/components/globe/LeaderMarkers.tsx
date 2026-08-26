@@ -20,6 +20,44 @@ function leaderCount(width: number): number {
   return width < 640 ? 3 : 5;
 }
 
+interface Rect {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+/**
+ * Rectangles claimed so far this frame, in rank order.
+ *
+ * Module-level rather than a ref threaded through props: there is exactly one
+ * globe per page, and the React Compiler (rightly) forbids mutating something
+ * handed in as a prop or hook argument.
+ */
+const occupied: Rect[] = [];
+
+function intersects(a: Rect, b: Rect): boolean {
+  return !(
+    a.right < b.left ||
+    a.left > b.right ||
+    a.bottom < b.top ||
+    a.top > b.bottom
+  );
+}
+
+/**
+ * Clears the claimed-rectangle list at the top of every frame.
+ *
+ * Mounted before the markers so its useFrame callback runs first — R3F invokes
+ * them in registration order, which is mount order, which is rank order.
+ */
+function ClearOccupied() {
+  useFrame(() => {
+    occupied.length = 0;
+  });
+  return null;
+}
+
 interface Leader {
   iso3: string;
   name: string;
@@ -56,6 +94,9 @@ function useLeaders(layer: GlobeLayer | undefined, count: number): Leader[] {
   }, [layer, count]);
 }
 
+/** Vertical nudges tried, in order, before a label gives up and hides. */
+const NUDGES = [0, -22, 22, -44, 44];
+
 function Marker({
   leader,
   unit,
@@ -71,6 +112,7 @@ function Marker({
 
   const normal = useMemo(() => leader.position.clone().normalize(), [leader.position]);
   const toCamera = useMemo(() => new THREE.Vector3(), []);
+  const offsetRef = useRef(0);
 
   useFrame(() => {
     const el = wrapRef.current;
@@ -82,8 +124,46 @@ function Marker({
     const facing = normal.dot(toCamera);
     const opacity = THREE.MathUtils.clamp((facing - 0.15) / 0.28, 0, 1);
 
+    if (opacity <= 0.01) {
+      el.style.opacity = "0";
+      el.style.pointerEvents = "none";
+      return;
+    }
+
+    // Labels are placed in rank order, so the highest-ranked country always
+    // keeps its natural position and lower ranks move out of its way. Without
+    // this, neighbours like Germany and the United Kingdom overlap into an
+    // unreadable stack.
+    const box = el.getBoundingClientRect();
+    const height = box.height || 22;
+    const width = box.width || 120;
+    const baseTop = box.top - offsetRef.current;
+
+    let placed = false;
+    for (const nudge of NUDGES) {
+      const candidate: Rect = {
+        top: baseTop + nudge,
+        bottom: baseTop + nudge + height,
+        left: box.left,
+        right: box.left + width,
+      };
+      if (occupied.some((r) => intersects(candidate, r))) continue;
+      occupied.push(candidate);
+      offsetRef.current = nudge;
+      placed = true;
+      break;
+    }
+
+    if (!placed) {
+      // Every slot taken: yield entirely rather than stack.
+      el.style.opacity = "0";
+      el.style.pointerEvents = "none";
+      return;
+    }
+
+    el.style.transform = `translateY(${offsetRef.current}px)`;
     el.style.opacity = String(opacity);
-    // Never let an invisible label intercept a click meant for the globe.
+    // Never let a barely-visible label intercept a click meant for the globe.
     el.style.pointerEvents = opacity > 0.6 ? "auto" : "none";
   });
 
@@ -121,8 +201,7 @@ function Marker({
  * Labels the top-ranked countries for the active layer directly on the globe.
  *
  * Without these the globe is a pretty colour field: you can see that somewhere
- * is dark teal but not that it is the United Arab Emirates at 70%. Five is the
- * limit — past that the labels collide and the map stops being readable.
+ * is dark teal but not that it is the United Arab Emirates at 70%.
  */
 export function LeaderMarkers({ layers }: { layers: GlobeLayer[] }) {
   const layerIndex = useGlobeStore((s) => s.layerIndex);
@@ -136,6 +215,7 @@ export function LeaderMarkers({ layers }: { layers: GlobeLayer[] }) {
 
   return (
     <>
+      <ClearOccupied />
       {leaders.map((leader) => (
         <Marker
           key={`${layer.key}-${leader.iso3}`}
