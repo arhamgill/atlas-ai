@@ -10,6 +10,8 @@ export interface GlobeState {
   /** Suppresses idle auto-rotation once the user takes control. */
   interacted: boolean;
   ready: boolean;
+  /** The opening camera flight has landed. */
+  introDone: boolean;
 
   setLayer: (i: number) => void;
   setHovered: (iso3: string | null) => void;
@@ -17,6 +19,7 @@ export interface GlobeState {
   setPointer: (x: number, y: number) => void;
   markInteracted: () => void;
   setReady: (v: boolean) => void;
+  finishIntro: () => void;
 }
 
 export const useGlobeStore = create<GlobeState>((set) => ({
@@ -26,6 +29,7 @@ export const useGlobeStore = create<GlobeState>((set) => ({
   pointer: { x: 0, y: 0 },
   interacted: false,
   ready: false,
+  introDone: false,
 
   setLayer: (layerIndex) => set({ layerIndex }),
   setHovered: (hovered) => set({ hovered }),
@@ -33,4 +37,5 @@ export const useGlobeStore = create<GlobeState>((set) => ({
   setPointer: (x, y) => set({ pointer: { x, y } }),
   markInteracted: () => set({ interacted: true }),
   setReady: (ready) => set({ ready }),
+  finishIntro: () => set({ introDone: true }),
 }));

@@ -9,7 +9,18 @@ import { latLngToVector3 } from "@/lib/geo/sphere";
 import { getCountryFeatures } from "@/lib/geo/topology";
 import { useGlobeStore } from "@/lib/state/globe";
 
-type Controls = { update: () => void; autoRotate: boolean; target: THREE.Vector3 };
+type Controls = {
+  update: () => void;
+  autoRotate: boolean;
+  enabled: boolean;
+  target: THREE.Vector3;
+};
+
+/** Where the camera comes to rest. */
+const REST_DISTANCE = 3.55;
+/** Where the intro starts: far enough out that the globe reads as small. */
+const INTRO_DISTANCE = 13;
+const INTRO_SECONDS = 2.4;
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
@@ -17,7 +28,18 @@ function prefersReducedMotion(): boolean {
 }
 
 /**
- * Orbit controls plus a damped flight to whichever country is selected.
+ * Slow out, quick through the middle, slow in. An ease-out alone front-loads
+ * almost all the motion into the first half second, so the globe appears to
+ * snap into place and then crawl — this keeps it visibly travelling for the
+ * whole flight, which is what reads as cinematic.
+ */
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+/**
+ * Orbit controls, the opening flight, and a damped flight to whichever country
+ * is selected.
  *
  * The globe mesh itself never rotates — the camera orbits instead. That keeps
  * world space and globe space identical, so a raycast hit can be converted
@@ -30,10 +52,45 @@ export function CameraRig() {
   const selected = useGlobeStore((s) => s.selected);
   const interacted = useGlobeStore((s) => s.interacted);
   const markInteracted = useGlobeStore((s) => s.markInteracted);
+  const introDone = useGlobeStore((s) => s.introDone);
+  const finishIntro = useGlobeStore((s) => s.finishIntro);
 
   const flightTarget = useRef<THREE.Vector3 | null>(null);
   const flying = useRef(false);
 
+  // --- Opening flight ------------------------------------------------------
+  const introStart = useRef(0);
+  const introFrom = useRef(new THREE.Vector3());
+  const introTo = useRef(new THREE.Vector3());
+  const introActive = useRef(false);
+
+  useEffect(() => {
+    if (introDone) return;
+
+    if (prefersReducedMotion()) {
+      camera.position.set(0, 0.42, REST_DISTANCE);
+      finishIntro();
+      return;
+    }
+
+    // Start further out and swung round, so the flight covers distance *and*
+    // longitude — a pure dolly reads as a zoom, not an arrival.
+    const from = new THREE.Vector3(-0.55, 0.3, 1)
+      .normalize()
+      .multiplyScalar(INTRO_DISTANCE);
+    const to = new THREE.Vector3(0, 0.42, REST_DISTANCE);
+
+    introFrom.current.copy(from);
+    introTo.current.copy(to);
+    camera.position.copy(from);
+    introStart.current = performance.now();
+    introActive.current = true;
+
+    // Controls would fight us for the camera during the flight.
+    if (controlsRef.current) controlsRef.current.enabled = false;
+  }, [introDone, camera, finishIntro]);
+
+  // --- Flight to a selected country ---------------------------------------
   useEffect(() => {
     if (!selected) {
       flying.current = false;
@@ -58,9 +115,78 @@ export function CameraRig() {
     flying.current = true;
   }, [selected, camera]);
 
-  useFrame((_, delta) => {
+  // An opening animation the user cannot skip is an obstacle. Any pointer or
+  // key press lands the camera immediately.
+  useEffect(() => {
+    if (introDone) return;
+    const skip = () => {
+      if (!introActive.current) return;
+      introActive.current = false;
+      camera.position.copy(introTo.current);
+      camera.lookAt(0, 0, 0);
+      const controls = controlsRef.current;
+      if (controls) {
+        controls.enabled = true;
+        controls.update();
+      }
+      finishIntro();
+    };
+    window.addEventListener("pointerdown", skip);
+    window.addEventListener("keydown", skip);
+    window.addEventListener("wheel", skip, { passive: true });
+    return () => {
+      window.removeEventListener("pointerdown", skip);
+      window.removeEventListener("keydown", skip);
+      window.removeEventListener("wheel", skip);
+    };
+  }, [introDone, camera, finishIntro]);
+
+  useFrame((_, rawDelta) => {
     const controls = controlsRef.current;
     if (!controls) return;
+
+    // The first frame after mount can carry seconds of accumulated startup
+    // stall. Left unclamped that consumed the entire opening flight in one
+    // frame, so the animation simply never played on a slow device.
+    const delta = Math.min(rawDelta, 1 / 30);
+
+    // --- Opening flight owns the camera until it lands ---------------------
+    if (introActive.current) {
+      controls.enabled = false;
+      // Wall clock, not accumulated frame deltas. A timed cinematic should
+      // last the same three seconds whether the device renders it at 120 fps
+      // or at 8 — deltas make it either skip or crawl.
+      const t = Math.min(
+        1,
+        (performance.now() - introStart.current) / (INTRO_SECONDS * 1000),
+      );
+      const eased = easeInOutCubic(t);
+
+      // Interpolate along the arc rather than the chord, so the camera swings
+      // around the globe instead of cutting toward it in a straight line.
+      const from = introFrom.current;
+      const to = introTo.current;
+      const dir = from
+        .clone()
+        .normalize()
+        .lerp(to.clone().normalize(), eased)
+        .normalize();
+      const dist = THREE.MathUtils.lerp(from.length(), to.length(), eased);
+      camera.position.copy(dir.multiplyScalar(dist));
+      camera.lookAt(0, 0, 0);
+
+      if (t >= 1) {
+        introActive.current = false;
+        controls.enabled = true;
+        controls.update();
+        finishIntro();
+      }
+      // Deliberately NOT calling controls.update() mid-flight: it clamps the
+      // orbit radius to maxDistance and rewrites camera.position from its own
+      // spherical state, which snapped the intro to its final framing on the
+      // very first frame. The rig owns the camera until the flight lands.
+      return;
+    }
 
     // Idle presentation: rotate until the user takes over, then never again.
     controls.autoRotate = !interacted && !selected;
