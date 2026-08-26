@@ -19,9 +19,12 @@ updated as work lands.
 
 ## Current state
 
-**V0 — Foundation.** Scaffold + full ingest pipeline complete. Neon Postgres holds
-3,419 metric rows / 3,419 rankings / 1,052 models across 194 countries, all integrity
-checks passing. Remaining V0 item: the R3F globe spike.
+**V0 complete.** Scaffold, full ingest pipeline, and the interactive globe are all
+done. Neon Postgres holds 3,419 metric rows / 3,419 rankings / 1,052 models across 194
+countries, all integrity checks passing. Next up: V1 country pages.
+
+The globe (`src/components/globe/`) is a single textured sphere, not per-country meshes
+— see the Globe section below before changing it.
 
 Read [docs/DECISIONS.md](docs/DECISIONS.md) before changing the schema or the ingest —
 it records why things are the way they are, including two data-quality traps.
@@ -108,6 +111,35 @@ Layout: `src/components/{globe,charts,panels,ui}` · `src/lib/{db,geo,metrics,st
 - Charts are **hand-built React + SVG on d3 scales**. No chart libraries.
 - Anti-goals: no card grid of coloured stat boxes, no glassmorphism, no gradient-on-
   everything, no emoji flags in data tables, no sidebar nav.
+
+## Globe
+
+`src/components/globe/`. The load-bearing decisions, all of which look like details
+until you undo one:
+
+- **One sphere, not 177 meshes.** The choropleth is painted into a 2048x1024 canvas
+  (`lib/geo/render-maps.ts`) and mapped on. Layer switches are a GPU crossfade between
+  two textures. Picking is CPU-side `geoContains` with a bbox prefilter
+  (`lib/geo/topology.ts`) — exact, and no ID-buffer readback.
+- **The globe never rotates; the camera orbits.** World space and globe space stay
+  identical, so a raycast hit converts straight to lat/lng with no rotation to unwind.
+  `lib/geo/sphere.ts` holds the two conversions and they must stay exact inverses —
+  there are round-trip tests.
+- **Never call `controls.update()` while the rig owns the camera.** OrbitControls
+  clamps radius to `maxDistance` and rewrites `camera.position` from its own spherical
+  state, which silently kills any hand-driven camera move.
+- **Timed animations use wall clock, not accumulated frame deltas.** The first frame
+  after mount can carry seconds of startup stall and will consume an entire animation
+  in one tick. Frame deltas are clamped to 1/30s everywhere else.
+- **Atmosphere is a camera-facing quad (`Halo.tsx`), not a back-faced shell.** A
+  shell's fresnel peaks at its own limb and draws a hard ring in mid-air.
+- **Lighting is deliberately flat.** A realistic terminator hides half the choropleth.
+  This is a data map, not a planet simulation.
+- **Any full-screen overlay above the canvas needs `pointer-events-none`.** This has
+  already broken the globe once, and it looks completely fine while being inert.
+- Camera distance is derived from whichever FOV axis is tighter, so framing is correct
+  from a 390px phone to an ultrawide.
+- View state lives in the URL (`?layer=&country=`), replace-not-push.
 
 ## Accessibility
 

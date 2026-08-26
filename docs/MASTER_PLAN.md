@@ -281,10 +281,10 @@ Sequential, perceptually uniform, ≥3:1 against `--bg-base` at the light end. V
 - [x] ~~Ingest the three OWID layer CSVs~~ **DONE** — adoption 147 / investment 119 / research 190
 - [x] ~~Ingest Epoch notable models~~ **DONE** — 1,052 models, 34 countries, 0 unresolved
 - [x] ~~Cross-check adoption against the Microsoft CSV~~ **DONE** — 5 hard checks in `pnpm ingest:report`, all passing
-- [ ] Snapshot AI Index public data from Drive → `data/snapshots/` with retrieval date
+- [x] ~~Snapshot AI Index public data from Drive~~ **DROPPED** — OWID already republishes the AI Index figures we use, with ISO3 codes; a manual Drive download would have no consumer
 - [x] ~~Drizzle schema + Neon connection + first migration + full seed~~ **DONE** — 8 tables, 3,419 metric rows
 - [x] ~~`compute-rankings.ts` producing ranks and deltas~~ **DONE** — competition ranking, 34 unit tests
-- [ ] **R3F globe spike:** sphere + TopoJSON polygons + hover pick + one metric colored. Ugly is fine. Prove picking and 60 fps.
+- [x] ~~R3F globe spike~~ **DONE** — shipped well past a spike: textured-sphere choropleth, atmosphere, bloom, starfield, hover/click picking, opening flight, leader labels with collision avoidance, keyboard control, URL deep links, phone support
 - [x] ~~`docs/DECISIONS.md` started~~ **DONE** — 6 ADRs incl. two data-quality traps
 
 **Exit gate:** a Postgres database with real, ranked, source-attributed data for ≥140 countries on the adoption layer, and a globe that responds to a click.
