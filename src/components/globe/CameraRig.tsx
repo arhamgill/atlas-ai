@@ -129,7 +129,11 @@ export function CameraRig() {
     if (!feature) return;
 
     const [lng, lat] = geoCentroid(feature);
-    const distance = camera.position.length();
+    // Preserve whatever zoom the user has chosen — unless the opening flight
+    // is still running, in which case the camera is somewhere out at 13 units
+    // and reading its position would strand a deep-linked country at that
+    // distance for good.
+    const distance = introActive.current ? restDistance : camera.position.length();
     const [x, y, z] = latLngToVector3(lat, lng, distance);
     const target = new THREE.Vector3(x, y, z);
 
@@ -142,7 +146,7 @@ export function CameraRig() {
 
     flightTarget.current = target;
     flying.current = true;
-  }, [selected, camera]);
+  }, [selected, camera, restDistance]);
 
   // An opening animation the user cannot skip is an obstacle. Any pointer or
   // key press lands the camera immediately.
@@ -231,10 +235,15 @@ export function CameraRig() {
 
     // Ramping the speed rather than toggling the flag means it fades in and
     // out instead of snapping.
-    controls.autoRotate = true;
     const wantSpeed = shouldRotate ? AUTO_ROTATE_SPEED : 0;
     controls.autoRotateSpeed +=
       (wantSpeed - controls.autoRotateSpeed) * (1 - Math.pow(0.06, delta));
+
+    // Switch the flag off once the ramp has effectively reached zero. Left on,
+    // OrbitControls keeps applying a near-zero rotation every frame, which is
+    // enough to stop a camera flight ever settling inside its arrival
+    // threshold — the rig then lerps forever against the nudge.
+    controls.autoRotate = controls.autoRotateSpeed > 0.005;
 
     // Re-frame on resize / orientation change, but only while the user has
     // not taken control — otherwise this would fight their chosen zoom.
