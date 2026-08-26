@@ -5,6 +5,7 @@ import type { GlobeLayer } from "@/lib/db/queries";
 import { useGlobeStore } from "@/lib/state/globe";
 import { GlobeHud, type CountryMeta } from "./GlobeHud";
 import { useGlobeKeyboard } from "./useGlobeKeyboard";
+import { useGlobeUrlState } from "./useGlobeUrlState";
 
 /**
  * three.js is ~600 KB and touches `window` at import time, so the scene is
@@ -25,6 +26,7 @@ export function GlobeExperience({
   const selected = useGlobeStore((s) => s.selected);
 
   useGlobeKeyboard(layers);
+  useGlobeUrlState(layers);
 
   return (
     <div className="relative h-[100svh] w-full overflow-hidden">
