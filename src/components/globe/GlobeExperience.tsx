@@ -1,10 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
 import type { GlobeLayer } from "@/lib/db/queries";
 import { useGlobeStore } from "@/lib/state/globe";
 import { GlobeHud, type CountryMeta } from "./GlobeHud";
+import { useGlobeKeyboard } from "./useGlobeKeyboard";
 
 /**
  * three.js is ~600 KB and touches `window` at import time, so the scene is
@@ -23,15 +23,8 @@ export function GlobeExperience({
 }) {
   const ready = useGlobeStore((s) => s.ready);
   const selected = useGlobeStore((s) => s.selected);
-  const setSelected = useGlobeStore((s) => s.setSelected);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && selected) setSelected(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [selected, setSelected]);
+  useGlobeKeyboard(layers);
 
   return (
     <div className="relative h-[100svh] w-full overflow-hidden">
@@ -71,7 +64,7 @@ export function GlobeExperience({
 
       {!selected && (
         <p className="numeric text-2xs pointer-events-none absolute top-8 right-8 z-10 hidden tracking-[0.14em] text-[var(--text-tertiary)] uppercase sm:block">
-          Drag to rotate · Click a country
+          Drag to rotate · 1-4 layers · ← → ranking
         </p>
       )}
     </div>
