@@ -12,6 +12,7 @@ import { useGlobeStore } from "@/lib/state/globe";
 type Controls = {
   update: () => void;
   autoRotate: boolean;
+  autoRotateSpeed: number;
   enabled: boolean;
   target: THREE.Vector3;
 };
@@ -40,6 +41,9 @@ function restDistanceFor(aspect: number, fovDeg: number): number {
 /** Where the intro starts: far enough out that the globe reads as small. */
 const INTRO_DISTANCE = 13;
 const INTRO_SECONDS = 2.4;
+/** Quiet time before the globe starts turning again. */
+const IDLE_RESUME_MS = 12000;
+const AUTO_ROTATE_SPEED = 0.32;
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
@@ -213,8 +217,24 @@ export function CameraRig() {
       return;
     }
 
-    // Idle presentation: rotate until the user takes over, then never again.
-    controls.autoRotate = !interacted && !selected;
+    // Idle presentation. Rather than stopping forever on first touch, the
+    // globe eases back into its slow turn after a quiet spell — it keeps the
+    // page feeling alive on a second monitor without ever yanking the view
+    // away from someone who is still reading.
+    //
+    // Read straight from the store: a value closed over from render would be
+    // stale inside the frame loop.
+    const { lastInteraction } = useGlobeStore.getState();
+    const quietFor = performance.now() - lastInteraction;
+    const shouldRotate =
+      !selected && (lastInteraction === 0 || quietFor > IDLE_RESUME_MS);
+
+    // Ramping the speed rather than toggling the flag means it fades in and
+    // out instead of snapping.
+    controls.autoRotate = true;
+    const wantSpeed = shouldRotate ? AUTO_ROTATE_SPEED : 0;
+    controls.autoRotateSpeed +=
+      (wantSpeed - controls.autoRotateSpeed) * (1 - Math.pow(0.06, delta));
 
     // Re-frame on resize / orientation change, but only while the user has
     // not taken control — otherwise this would fight their chosen zoom.
@@ -252,7 +272,7 @@ export function CameraRig() {
       zoomSpeed={0.6}
       minDistance={restDistance * 0.55}
       maxDistance={restDistance * 1.7}
-      autoRotateSpeed={0.32}
+      autoRotateSpeed={AUTO_ROTATE_SPEED}
       onStart={() => {
         flying.current = false;
         markInteracted();
