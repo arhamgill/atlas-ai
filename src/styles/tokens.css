@@ -45,12 +45,14 @@
    * Coverage noted per layer (see MASTER_PLAN → Data sources).
    * ------------------------------------------------------------------- */
 
-  /* Adoption — teal→cyan. 147 countries. */
-  --ramp-adoption-1: #0b3b3f;
-  --ramp-adoption-2: #12595e;
-  --ramp-adoption-3: #1a7f82;
-  --ramp-adoption-4: #2fa8a4;
-  --ramp-adoption-5: #5ee0d0;
+  /* Adoption — green. 147 countries. The default layer, so it gets the
+     strongest ramp: green reads brightest against the near-black ocean and
+     separates most cleanly from the cyan accent used for interaction. */
+  --ramp-adoption-1: #10331c;
+  --ramp-adoption-2: #1a5730;
+  --ramp-adoption-3: #277f45;
+  --ramp-adoption-4: #3baa5f;
+  --ramp-adoption-5: #63d683;
 
   /* Investment — amber. 119 countries. */
   --ramp-investment-1: #3d2708;
@@ -66,12 +68,12 @@
   --ramp-development-4: #8760be;
   --ramp-development-5: #b08ce8;
 
-  /* Research — green. 189 countries. */
-  --ramp-research-1: #10331c;
-  --ramp-research-2: #1a5730;
-  --ramp-research-3: #277f45;
-  --ramp-research-4: #3baa5f;
-  --ramp-research-5: #63d683;
+  /* Research — teal→cyan. 190 countries. */
+  --ramp-research-1: #0b3b3f;
+  --ramp-research-2: #12595e;
+  --ramp-research-3: #1a7f82;
+  --ramp-research-4: #2fa8a4;
+  --ramp-research-5: #5ee0d0;
 
   /* --- Motion ---------------------------------------------------------
    * One easing curve everywhere. Durations are semantic, not arbitrary.

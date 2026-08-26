@@ -256,7 +256,7 @@ models       (id PK, name, organization, country_iso3 FK, release_date,
 ```
 
 **Per-layer data ramps** give each layer its own identity so the globe reads differently at a glance:
-adoption → teal-cyan (147 countries) · investment → amber (119) · development → violet (35, mostly no-data) · research → green (189).
+adoption → green (147 countries) · investment → amber (119) · development → violet (35, mostly no-data) · research → teal-cyan (190).
 Sequential, perceptually uniform, ≥3:1 against `--bg-base` at the light end. Validate with the `dataviz` skill's checker.
 
 **Type:** Geist Sans (UI) + Geist Mono (all numerics, tabular figures — `font-variant-numeric: tabular-nums` on every figure so digits don't jitter during count-up animations). Scale: 11/12/14/16/20/28/40/64.
