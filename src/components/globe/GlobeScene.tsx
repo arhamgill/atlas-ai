@@ -11,6 +11,7 @@ import { Halo } from "./Halo";
 import { CameraRig } from "./CameraRig";
 import { Earth } from "./Earth";
 import { Starfield } from "./Starfield";
+import { ViewOffset } from "./ViewOffset";
 
 function isCoarsePointer(): boolean {
   if (typeof window === "undefined") return false;
@@ -46,6 +47,7 @@ export function GlobeScene({ layers }: { layers: GlobeLayer[] }) {
       <Halo size={4.6} intensity={0.42} falloff={6.5} />
 
       <CameraRig />
+      <ViewOffset />
 
       {!lowPower && (
         <EffectComposer>
