@@ -65,7 +65,7 @@ export function GlobeExperience({
       )}
 
       {!selected && (
-        <p className="numeric text-2xs pointer-events-none absolute top-8 right-8 z-10 hidden tracking-[0.14em] text-[var(--text-tertiary)] uppercase sm:block">
+        <p className="numeric text-2xs pointer-events-none absolute top-20 right-8 z-10 hidden tracking-[0.14em] text-[var(--text-tertiary)] uppercase sm:block">
           Drag to rotate · 1-4 layers · ← → ranking
         </p>
       )}

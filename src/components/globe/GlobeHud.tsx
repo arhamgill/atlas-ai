@@ -132,10 +132,7 @@ export function GlobeHud({ layers, countries }: Props) {
       </div>
 
       {/* ---------- Title + legend ---------- */}
-      <div className="pointer-events-none absolute top-0 left-0 z-20 max-w-[78%] bg-[radial-gradient(120%_100%_at_0%_0%,var(--bg-base)_25%,transparent_75%)] p-4 pr-10 pb-10 sm:max-w-none sm:p-8 sm:pr-16">
-        <p className="text-2xs tracking-[0.24em] text-[var(--text-tertiary)] uppercase">
-          AI Atlas
-        </p>
+      <div className="pointer-events-none absolute top-14 left-0 z-20 max-w-[78%] bg-[radial-gradient(120%_100%_at_0%_0%,var(--bg-base)_25%,transparent_75%)] p-4 pr-10 pb-10 sm:max-w-none sm:px-8 sm:pt-4 sm:pr-16">
         <AnimatePresence mode="wait">
           <motion.h1
             key={active.key}
