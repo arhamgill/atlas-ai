@@ -169,6 +169,8 @@ pnpm ingest:report                  # verify what landed
 pnpm dev                            # http://localhost:3000
 ```
 
+Deploying is covered in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
 `pnpm ingest:report` runs hard integrity checks against figures verified by hand at the
 source. If the United Arab Emirates is not 70.1% at Q1 2026, the pipeline is wrong no
 matter how healthy the row counts look.

@@ -6,8 +6,13 @@ function connectionString(): string {
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      "DATABASE_URL is not set. Copy .env.example to .env.local and add your " +
-        "Neon pooled connection string.",
+      [
+        "DATABASE_URL is not set.",
+        "  Local:  copy .env.example to .env.local and paste your Neon pooled connection string.",
+        "  Hosted: add DATABASE_URL to the project's environment variables for Production,",
+        "          Preview and Development — the build reads it while prerendering country",
+        "          pages, not only at runtime.",
+      ].join("\n"),
     );
   }
   if (!url.includes("-pooler")) {
