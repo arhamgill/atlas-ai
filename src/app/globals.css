@@ -91,3 +91,64 @@
     text-wrap: balance;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * View transitions
+ *
+ * One transition, used once: the country name you clicked flies into place as
+ * the heading of the page it opens. Everything else swaps instantly.
+ *
+ * The globe route opts out entirely by having no <ViewTransition> in its tree —
+ * see GlobeHud. Snapshotting a full-viewport WebGL canvas took 1.6s to reach
+ * `ready` against 92ms from the countries table.
+ * ------------------------------------------------------------------------- */
+
+/* The root snapshot is the whole page, canvas included. Left animating, every
+   navigation pays for it. */
+::view-transition-group(root) {
+  animation: none;
+}
+
+/* The overlay swallows clicks for the duration of the animation. */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: var(--dur-panel);
+  animation-timing-function: var(--ease);
+}
+
+/* Text morphing between 14px and 40px interpolates as a scaled bitmap; a touch
+   of blur mid-flight hides the artefacts. */
+::view-transition-image-pair(.morph) {
+  animation-name: morph-blur;
+  animation-duration: var(--dur-panel);
+}
+
+@keyframes morph-blur {
+  30% {
+    filter: blur(2px);
+  }
+}
+
+/* The nav is fixed and identical on both pages — it must not slide or flash. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 1ms !important;
+    animation-delay: 0s !important;
+  }
+}

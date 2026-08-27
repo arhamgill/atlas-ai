@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ViewTransition } from "react";
 import type { Peer } from "@/lib/db/queries";
 import { layerColor } from "@/components/charts/primitives";
 import { formatMetric } from "@/lib/metrics/scales";
@@ -81,9 +82,15 @@ export function PeerStrip({
                     <p className="numeric text-2xs text-[var(--text-tertiary)]">
                       #{entry.rank}
                     </p>
-                    <p className="mt-1.5 truncate text-sm text-[var(--text-secondary)]">
-                      {entry.name}
-                    </p>
+                    <ViewTransition
+                      name={`country-name-${entry.iso3}`}
+                      share="morph"
+                      default="none"
+                    >
+                      <p className="mt-1.5 truncate text-sm text-[var(--text-secondary)]">
+                        {entry.name}
+                      </p>
+                    </ViewTransition>
                     <p className="numeric text-2xs mt-1 text-[var(--text-tertiary)]">
                       {"value" in entry && entry.value !== null
                         ? formatMetric(entry.value, unit, precision)

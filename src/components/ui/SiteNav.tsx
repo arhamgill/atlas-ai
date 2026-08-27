@@ -21,7 +21,10 @@ export function SiteNav() {
   const pathname = usePathname();
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+    <header
+      className="pointer-events-none fixed inset-x-0 top-0 z-50"
+      style={{ viewTransitionName: "site-header" }}
+    >
       <div className="absolute inset-0 h-20 bg-gradient-to-b from-[var(--bg-base)] via-[color-mix(in_srgb,var(--bg-base)_70%,transparent)] to-transparent" />
 
       <nav

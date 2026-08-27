@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import type { GlobeLayer } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
@@ -219,12 +220,19 @@ export function GlobeHud({ layers, countries }: Props) {
             transition={{ duration: 0.35, ease: EASE }}
             className="pointer-events-auto absolute top-0 right-0 z-30 flex h-full w-full max-w-[340px] flex-col border-l border-[var(--border-subtle)] bg-[color-mix(in_srgb,var(--bg-surface)_92%,transparent)] backdrop-blur-xl"
           >
-            <header className="flex items-start justify-between gap-4 border-b border-[var(--border-subtle)] p-5">
+            <header className="flex items-start justify-between gap-4 border-b border-[var(--border-subtle)] p-5 pt-[calc(--spacing(14)+--spacing(4))]">
               <div>
                 <p className="numeric text-2xs tracking-[0.18em] text-[var(--text-tertiary)] uppercase">
                   {selectedMeta.iso3}
                   {selectedMeta.region ? ` · ${selectedMeta.region}` : ""}
                 </p>
+                {/* Deliberately NOT wrapped in <ViewTransition> to pair with
+                    the country page heading, the way the table rows are.
+                    React only starts a view transition when one is present in
+                    the outgoing tree, and starting one here makes the browser
+                    snapshot a full-viewport WebGL canvas: 1.6s to reach `ready`
+                    against 92ms from the table, with the globe frozen for all
+                    of it. A text morph is not worth that. */}
                 <h2 className="mt-1.5 text-[length:var(--text-lg)] leading-tight font-medium">
                   {selectedMeta.name}
                 </h2>
@@ -349,10 +357,41 @@ export function GlobeHud({ layers, countries }: Props) {
               })}
             </div>
 
-            <footer className="border-t border-[var(--border-subtle)] p-4">
-              <p className="text-2xs leading-relaxed text-[var(--text-tertiary)]">
-                {active.methodologyNote ?? "Source data as published."}
-              </p>
+            <footer className="border-t border-[var(--border-subtle)]">
+              {/* The globe is the primary navigation surface, so it has to lead
+                  somewhere. Without this the panel is four numbers and a dead
+                  end — the full profile was only reachable via the table or
+                  the command palette. */}
+              <Link
+                href={`/countries/${selected.toLowerCase()}`}
+                className="group/link flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] px-4 py-3.5 transition-colors hover:bg-[var(--bg-raised)]"
+                style={{
+                  transitionDuration: "var(--dur-ui)",
+                  transitionTimingFunction: "var(--ease)",
+                }}
+              >
+                <span className="text-2xs tracking-[0.14em] text-[var(--accent)] uppercase">
+                  Full profile
+                </span>
+                <span
+                  className="text-[var(--accent)] transition-transform group-hover/link:translate-x-0.5"
+                  style={{ transitionDuration: "var(--dur-ui)" }}
+                  aria-hidden
+                >
+                  →
+                </span>
+              </Link>
+              {/* This note runs to a full paragraph, and open by default it
+                  took 40% of the panel — pushing two of the four layers below
+                  the fold on a 900px viewport. */}
+              <details className="p-4">
+                <summary className="text-2xs cursor-pointer list-none tracking-[0.14em] text-[var(--text-tertiary)] uppercase transition-colors hover:text-[var(--text-secondary)]">
+                  Method &amp; caveats
+                </summary>
+                <p className="text-2xs mt-2.5 leading-relaxed text-[var(--text-tertiary)]">
+                  {active.methodologyNote ?? "Source data as published."}
+                </p>
+              </details>
             </footer>
           </motion.aside>
         )}

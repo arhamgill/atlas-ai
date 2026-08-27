@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TimeSeries } from "@/components/charts/TimeSeries";
@@ -110,9 +111,17 @@ export default async function CountryPage({
             ← All countries
           </Link>
 
-          <h1 className="mt-4 text-[length:var(--text-3xl)] leading-[0.95] font-medium tracking-tight text-balance">
-            {country.name}
-          </h1>
+          {/* Paired with the name in the countries table and the peer strip:
+              the label you clicked flies into place as the heading. */}
+          <ViewTransition
+            name={`country-name-${country.iso3}`}
+            share="morph"
+            default="none"
+          >
+            <h1 className="mt-4 text-[length:var(--text-3xl)] leading-[0.95] font-medium tracking-tight text-balance">
+              {country.name}
+            </h1>
+          </ViewTransition>
 
           <p className="numeric mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--text-tertiary)]">
             <span className="tracking-[0.18em] uppercase">{country.iso3}</span>

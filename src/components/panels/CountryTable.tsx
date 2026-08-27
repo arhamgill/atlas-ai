@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ViewTransition,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { BarCell } from "@/components/charts/BarCell";
 import { Histogram } from "@/components/charts/Histogram";
 import { layerColor } from "@/components/charts/primitives";
@@ -240,7 +247,15 @@ export function CountryTable({ data }: { data: TableData }) {
                     }}
                     className="flex items-baseline gap-2 rounded-[var(--radius-sm)] text-sm text-[var(--text-primary)] outline-offset-4 transition-colors group-hover:text-[var(--accent)]"
                   >
-                    {row.name}
+                    {/* Pairs with the <h1> on the country page, so the name
+                        you clicked is the name that arrives. */}
+                    <ViewTransition
+                      name={`country-name-${row.iso3}`}
+                      share="morph"
+                      default="none"
+                    >
+                      <span>{row.name}</span>
+                    </ViewTransition>
                     <span className="numeric text-2xs text-[var(--text-tertiary)]">
                       {row.iso3}
                     </span>
