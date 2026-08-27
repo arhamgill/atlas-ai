@@ -13,6 +13,18 @@ export interface MetricDef {
   periodType: PeriodType;
   sourceId: string;
   methodologyNote?: string;
+  /**
+   * How the time series collapses to the single figure shown on the globe, in
+   * the country table and as a country's headline number.
+   *
+   * "latest" suits a stock measure. "total" exists for development, where
+   * releases are lumpy and the newest period is a partial year — at the time
+   * of writing only four countries had shipped a notable model in 2026, so
+   * "latest" reported China as 24 with a rank of 2 of 4 rather than its actual
+   * 184 all-time. The meaningful question there is "who has ever built
+   * frontier AI?".
+   */
+  aggregation: "latest" | "total";
 }
 
 /**
@@ -33,6 +45,7 @@ export const METRIC_DEFS: MetricDef[] = [
     layer: "adoption",
     periodType: "quarter",
     sourceId: "estimated-share-people-generative-ai",
+    aggregation: "latest",
     methodologyNote:
       "Microsoft AI Economy Institute estimates, republished by Our World in Data " +
       "with ISO3 codes. Covers 147 countries across three periods. " +
@@ -52,6 +65,7 @@ export const METRIC_DEFS: MetricDef[] = [
     layer: "investment",
     periodType: "annual",
     sourceId: "private-investment-in-artificial-intelligence-cset",
+    aggregation: "latest",
     methodologyNote:
       "CSET estimates. Covers 119 countries, 2016–2025. Absolute totals, not " +
       "population-adjusted — small economies rank low by construction.",
@@ -67,6 +81,7 @@ export const METRIC_DEFS: MetricDef[] = [
     layer: "research",
     periodType: "annual",
     sourceId: "annual-scholarly-publications-on-artificial-intelligence",
+    aggregation: "latest",
     methodologyNote:
       "Covers 190 countries, 2016–2024. Best country coverage in the project. " +
       "Includes Kosovo, which OWID codes as OWID_KOS and which has no ISO numeric — " +
@@ -85,6 +100,7 @@ export const METRIC_DEFS: MetricDef[] = [
     layer: "development",
     periodType: "annual",
     sourceId: "epoch-notable-ai-models",
+    aggregation: "total",
     methodologyNote:
       "Epoch AI. Only ~35 countries have ever produced a notable model, and the " +
       "United States and China dominate. Most of the map is legitimately no-data. " +
@@ -101,6 +117,7 @@ export const METRIC_DEFS: MetricDef[] = [
     layer: null,
     periodType: "quarter",
     sourceId: "estimated-share-people-generative-ai",
+    aggregation: "latest",
   },
 ];
 

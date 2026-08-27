@@ -1,5 +1,6 @@
 import { and, desc, eq, sql } from "drizzle-orm";
-import { countries, metricDefs, metrics, rankings } from "./schema";
+import { METRICS_BY_KEY } from "../metrics/registry";
+import { countries, metricDefs, metrics, models, rankings } from "./schema";
 import { db } from "./client";
 
 export interface LayerSummary {
@@ -163,23 +164,6 @@ export interface GlobeLayer {
   rows: LayerTuple[];
 }
 
-/**
- * How each layer collapses its time series into the single figure the globe
- * paints.
- *
- * Most layers want their latest period. `development` does not: notable-model
- * releases are lumpy, and the newest period is a partial year — at the time of
- * writing only four countries had shipped a notable model in 2026, which would
- * render as a near-empty globe. The meaningful question for that layer is
- * "who has ever built frontier AI?", so it sums across all periods.
- */
-const AGGREGATION: Record<string, "latest" | "total"> = {
-  adoption: "latest",
-  investment: "latest",
-  research: "latest",
-  development: "total",
-};
-
 /** Every globe layer collapsed to one value per country, ready for the client. */
 export async function getGlobeLayers(): Promise<GlobeLayer[]> {
   const defs = await db
@@ -214,7 +198,7 @@ export async function getGlobeLayers(): Promise<GlobeLayer[]> {
 
   const layers = await Promise.all(
     defs.map(async (d) => {
-      const mode = AGGREGATION[d.layer ?? ""] ?? "latest";
+      const mode = METRICS_BY_KEY.get(d.key)?.aggregation ?? "latest";
 
       if (mode === "total") {
         // Ranks are precomputed per period, so an all-time total needs its own
@@ -297,4 +281,436 @@ export async function getGlobeCountries() {
     })
     .from(countries);
   return rows.map((r) => ({ ...r, iso3: r.iso3.trim() }));
+}
+
+/* ---------------------------------------------------------------------------
+ * Aggregation
+ * ------------------------------------------------------------------------- */
+
+export interface Aggregated {
+  value: number;
+  rank: number;
+  delta: number | null;
+  total: number;
+  period: string;
+}
+
+/**
+ * Collapse a metric's whole series to one figure per country, honouring the
+ * aggregation policy declared in the metric registry.
+ *
+ * The "total" branch has to rank on the fly: the precomputed rankings table is
+ * per-period, and an all-time total has no period to look up.
+ */
+export async function aggregateMetric(
+  metricKey: string,
+): Promise<{ byCountry: Map<string, Aggregated>; period: string }> {
+  const def = METRICS_BY_KEY.get(metricKey);
+
+  if (def?.aggregation === "total") {
+    const [bounds] = await db
+      .select({
+        first: sql<string>`min(${metrics.period})`,
+        last: sql<string>`max(${metrics.period})`,
+      })
+      .from(metrics)
+      .where(eq(metrics.metricKey, metricKey));
+
+    const rows = await db
+      .select({
+        iso3: metrics.countryIso3,
+        value: sql<number>`sum(${metrics.value})`,
+        rank: sql<number>`rank() over (order by sum(${metrics.value}) desc)`,
+      })
+      .from(metrics)
+      .where(eq(metrics.metricKey, metricKey))
+      .groupBy(metrics.countryIso3);
+
+    const period = `${bounds?.first ?? ""}\u2013${bounds?.last ?? ""}`;
+    return {
+      period,
+      byCountry: new Map(
+        rows.map((r) => [
+          r.iso3.trim(),
+          {
+            value: Number(r.value),
+            rank: Number(r.rank),
+            delta: null,
+            total: rows.length,
+            period,
+          },
+        ]),
+      ),
+    };
+  }
+
+  const [latest] = await db
+    .select({ period: sql<string>`max(${metrics.period})` })
+    .from(metrics)
+    .where(eq(metrics.metricKey, metricKey));
+  const period = latest?.period ?? "";
+
+  const rows = await db
+    .select({
+      iso3: metrics.countryIso3,
+      value: metrics.value,
+      rank: rankings.rank,
+      delta: rankings.delta,
+    })
+    .from(metrics)
+    .leftJoin(
+      rankings,
+      and(
+        eq(rankings.countryIso3, metrics.countryIso3),
+        eq(rankings.metricKey, metrics.metricKey),
+        eq(rankings.period, metrics.period),
+      ),
+    )
+    .where(and(eq(metrics.metricKey, metricKey), eq(metrics.period, period)));
+
+  return {
+    period,
+    byCountry: new Map(
+      rows.map((r) => [
+        r.iso3.trim(),
+        {
+          value: r.value,
+          rank: r.rank ?? 0,
+          delta: r.delta,
+          total: rows.length,
+          period,
+        },
+      ]),
+    ),
+  };
+}
+
+/* ---------------------------------------------------------------------------
+ * Country detail
+ * ------------------------------------------------------------------------- */
+
+export interface SeriesPoint {
+  period: string;
+  value: number;
+  rank: number | null;
+  total: number | null;
+}
+
+export interface CountryMetric {
+  key: string;
+  label: string;
+  shortLabel: string;
+  layer: string | null;
+  unit: string;
+  precision: number;
+  periodType: string;
+  methodologyNote: string | null;
+  sourceId: string;
+  /** Most recent point that has a value. Null when the country has no data. */
+  latest: {
+    period: string;
+    value: number;
+    rank: number | null;
+    prevRank: number | null;
+    delta: number | null;
+    percentile: number | null;
+    total: number;
+  } | null;
+  series: SeriesPoint[];
+}
+
+export interface CountryModel {
+  id: string;
+  name: string;
+  organization: string | null;
+  publicationDate: string | null;
+  domain: string | null;
+  parameters: number | null;
+  trainingComputeFlop: number | null;
+  link: string | null;
+}
+
+export interface CountryDetail {
+  iso3: string;
+  iso2: string;
+  name: string;
+  officialName: string;
+  region: string | null;
+  subregion: string | null;
+  lat: number;
+  lng: number;
+  metrics: CountryMetric[];
+  models: CountryModel[];
+  modelCount: number;
+}
+
+/** How many countries are ranked for each metric+period, for "rank X of Y". */
+async function periodTotals(): Promise<Map<string, number>> {
+  const rows = await db
+    .select({
+      metricKey: rankings.metricKey,
+      period: rankings.period,
+      total: sql<number>`count(*)`,
+    })
+    .from(rankings)
+    .groupBy(rankings.metricKey, rankings.period);
+  return new Map(rows.map((r) => [`${r.metricKey}|${r.period}`, Number(r.total)]));
+}
+
+export async function getCountryDetail(iso3: string): Promise<CountryDetail | null> {
+  const code = iso3.toUpperCase();
+
+  const [country] = await db
+    .select()
+    .from(countries)
+    .where(eq(countries.iso3, code))
+    .limit(1);
+  if (!country) return null;
+
+  const [rows, defs, totals, modelRows] = await Promise.all([
+    db
+      .select({
+        metricKey: metrics.metricKey,
+        period: metrics.period,
+        value: metrics.value,
+        rank: rankings.rank,
+        prevRank: rankings.prevRank,
+        delta: rankings.delta,
+        percentile: rankings.percentile,
+      })
+      .from(metrics)
+      .leftJoin(
+        rankings,
+        and(
+          eq(rankings.countryIso3, metrics.countryIso3),
+          eq(rankings.metricKey, metrics.metricKey),
+          eq(rankings.period, metrics.period),
+        ),
+      )
+      .where(eq(metrics.countryIso3, code))
+      .orderBy(metrics.metricKey, metrics.period),
+    db.select().from(metricDefs).orderBy(metricDefs.key),
+    periodTotals(),
+    db
+      .select({
+        id: models.id,
+        name: models.name,
+        organization: models.organization,
+        publicationDate: models.publicationDate,
+        domain: models.domain,
+        parameters: models.parameters,
+        trainingComputeFlop: models.trainingComputeFlop,
+        link: models.link,
+      })
+      .from(models)
+      .where(eq(models.countryIso3, code))
+      .orderBy(desc(models.publicationDate))
+      .limit(12),
+  ]);
+
+  const [modelCountRow] = await db
+    .select({ n: sql<number>`count(*)` })
+    .from(models)
+    .where(eq(models.countryIso3, code));
+
+  const LAYER_ORDER = ["adoption", "investment", "development", "research"];
+
+  const layerDefs = defs.filter((d) => d.layer !== null);
+  const aggregates = new Map(
+    await Promise.all(
+      layerDefs.map(async (d) => [d.key, await aggregateMetric(d.key)] as const),
+    ),
+  );
+
+  const byKey = new Map<string, typeof rows>();
+  for (const r of rows) {
+    const bucket = byKey.get(r.metricKey) ?? [];
+    bucket.push(r);
+    byKey.set(r.metricKey, bucket);
+  }
+
+  const countryMetrics: CountryMetric[] = defs
+    .filter((d) => d.layer !== null)
+    .map((d) => {
+      const points = (byKey.get(d.key) ?? [])
+        .slice()
+        .sort((a, b) => a.period.localeCompare(b.period));
+      const last = points.at(-1);
+      // Headline figure follows the registry's aggregation policy, so a
+      // country's development number is its all-time total rather than
+      // whatever it happened to ship in a partial current year.
+      const agg = aggregates.get(d.key)?.byCountry.get(code);
+      return {
+        key: d.key,
+        label: d.label,
+        shortLabel: d.shortLabel,
+        layer: d.layer,
+        unit: d.unit,
+        precision: d.precision,
+        periodType: d.periodType,
+        methodologyNote: d.methodologyNote,
+        sourceId: d.sourceId,
+        latest: agg
+          ? {
+              period: agg.period,
+              value: agg.value,
+              rank: agg.rank,
+              prevRank: last?.prevRank ?? null,
+              delta: agg.delta,
+              percentile: last?.percentile ?? null,
+              total: agg.total,
+            }
+          : last
+            ? {
+                period: last.period,
+                value: last.value,
+                rank: last.rank,
+                prevRank: last.prevRank,
+                delta: last.delta,
+                percentile: last.percentile,
+                total: totals.get(`${d.key}|${last.period}`) ?? 0,
+              }
+            : null,
+        series: points.map((p) => ({
+          period: p.period,
+          value: p.value,
+          rank: p.rank,
+          total: totals.get(`${d.key}|${p.period}`) ?? null,
+        })),
+      };
+    })
+    .sort(
+      (a, b) => LAYER_ORDER.indexOf(a.layer ?? "") - LAYER_ORDER.indexOf(b.layer ?? ""),
+    );
+
+  return {
+    iso3: country.iso3.trim(),
+    iso2: country.iso2.trim(),
+    name: country.name,
+    officialName: country.officialName,
+    region: country.region,
+    subregion: country.subregion,
+    lat: country.lat,
+    lng: country.lng,
+    metrics: countryMetrics,
+    models: modelRows.map((m) => ({ ...m, id: m.id })),
+    modelCount: Number(modelCountRow?.n ?? 0),
+  };
+}
+
+/** Every country that has at least one metric — the set worth a page. */
+export async function getCountriesWithData(): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ iso3: metrics.countryIso3 })
+    .from(metrics)
+    .orderBy(metrics.countryIso3);
+  return rows.map((r) => r.iso3.trim());
+}
+
+/* ---------------------------------------------------------------------------
+ * Country index / table
+ * ------------------------------------------------------------------------- */
+
+export interface CountryRow {
+  iso3: string;
+  name: string;
+  region: string | null;
+  /** metric key -> latest value, rank and delta. */
+  values: Record<string, { value: number; rank: number | null; delta: number | null }>;
+}
+
+export interface CountryTable {
+  rows: CountryRow[];
+  layers: {
+    key: string;
+    layer: string;
+    label: string;
+    shortLabel: string;
+    unit: string;
+    precision: number;
+    period: string;
+    total: number;
+    max: number;
+    min: number;
+  }[];
+}
+
+/**
+ * The whole table in two queries: latest period per metric, then every value
+ * at those periods. Rendering 190+ rows client-side needs the data flat.
+ */
+export async function getCountryTable(): Promise<CountryTable> {
+  const defs = await db
+    .select({
+      key: metricDefs.key,
+      layer: metricDefs.layer,
+      label: metricDefs.label,
+      shortLabel: metricDefs.shortLabel,
+      unit: metricDefs.unit,
+      precision: metricDefs.precision,
+      latest: sql<string>`max(${metrics.period})`,
+    })
+    .from(metricDefs)
+    .innerJoin(metrics, eq(metrics.metricKey, metricDefs.key))
+    .where(sql`${metricDefs.layer} is not null`)
+    .groupBy(
+      metricDefs.key,
+      metricDefs.layer,
+      metricDefs.label,
+      metricDefs.shortLabel,
+      metricDefs.unit,
+      metricDefs.precision,
+    );
+
+  const LAYER_ORDER = ["adoption", "investment", "development", "research"];
+  defs.sort(
+    (a, b) => LAYER_ORDER.indexOf(a.layer ?? "") - LAYER_ORDER.indexOf(b.layer ?? ""),
+  );
+
+  const meta = await db
+    .select({ iso3: countries.iso3, name: countries.name, region: countries.region })
+    .from(countries);
+  const metaByIso3 = new Map(meta.map((m) => [m.iso3.trim(), m]));
+
+  const aggregated = await Promise.all(defs.map((d) => aggregateMetric(d.key)));
+
+  const byCountry = new Map<string, CountryRow>();
+  defs.forEach((d, i) => {
+    const agg = aggregated[i];
+    if (!agg) return;
+    for (const [iso3, a] of agg.byCountry) {
+      const m = metaByIso3.get(iso3);
+      if (!m) continue;
+      const entry = byCountry.get(iso3) ?? {
+        iso3,
+        name: m.name,
+        region: m.region,
+        values: {},
+      };
+      entry.values[d.key] = { value: a.value, rank: a.rank, delta: a.delta };
+      byCountry.set(iso3, entry);
+    }
+  });
+
+  const layers = defs.map((d, i) => {
+    const agg = aggregated[i];
+    const values = agg ? [...agg.byCountry.values()].map((a) => a.value) : [];
+    return {
+      key: d.key,
+      layer: d.layer ?? "",
+      label: d.label,
+      shortLabel: d.shortLabel,
+      unit: d.unit,
+      precision: d.precision,
+      period: agg?.period ?? d.latest,
+      total: values.length,
+      max: values.length ? Math.max(...values) : 1,
+      min: values.length ? Math.min(...values) : 0,
+    };
+  });
+
+  return {
+    rows: [...byCountry.values()].sort((a, b) => a.name.localeCompare(b.name)),
+    layers,
+  };
 }
