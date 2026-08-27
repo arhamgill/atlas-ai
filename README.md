@@ -32,20 +32,20 @@ that into one number would be inventing a finding rather than showing one.
 
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/country-panel.png" alt="The United States selected on the investment layer"></td>
+<td width="50%"><img src="docs/assets/country-panel.png" alt="The United States selected on the investment layer, with the decade scrubber below the globe"></td>
 <td width="50%"><img src="docs/assets/country-page.png" alt="China's country page, showing four metrics and their history"></td>
 </tr>
 <tr>
-<td><b>The globe</b> — click a country and the camera flies to it, the globe slides clear of the panel, and every layer's figure appears with its rank and movement. Switching layers crossfades the whole sphere to a new palette.</td>
+<td><b>The globe</b> — click a country and the camera flies to it, the globe slides clear of the panel, and every layer's figure appears with its rank and movement. Switching layers crossfades the whole sphere to a new palette; the scrubber walks it back through a decade.</td>
 <td><b>Country pages</b> — 194 of them, statically generated. The hero names the dimension that country actually leads on. Four metrics, their full history, and every notable AI model built there.</td>
 </tr>
 <tr>
-<td><img src="docs/assets/countries-table.png" alt="The ranked country table sorted by research output"></td>
+<td><img src="docs/assets/countries-table.png" alt="The ranked country table, each column headed by its own distribution"></td>
 <td><img src="docs/assets/compare.png" alt="Four countries compared across all dimensions"></td>
 </tr>
 <tr>
 <td><b>The ranked index</b> — the same data as a table, sortable by any dimension and filterable by region. The globe is not the only route to the data, which is why this is a requirement rather than a nice-to-have.</td>
-<td><b>Compare</b> — up to four countries at once. Bars are percentile <i>within each dimension</i>, the only scale on which a share of adults, a sum in dollars and a count of papers honestly sit together.</td>
+<td><b>Compare</b> — up to four countries at once. Bars are percentile <i>within each dimension</i>, the only scale on which a share of adults, a sum in dollars and a count of papers honestly sit together. Each cell carries the trajectory behind the figure.</td>
 </tr>
 </table>
 
@@ -107,6 +107,14 @@ into a 2048×1024 canvas and mapped on, so the sphere is a single draw call and 
 switch is a GPU crossfade between two textures. Picking runs on the CPU through
 `d3-geo`'s point-in-polygon with a bounding-box prefilter — exact, and no ID-buffer
 readback. That leaves the entire GPU budget for atmosphere, bloom and starfield.
+
+**Scrubbing time re-paints, but never re-scales.** The globe steps through a layer's
+history — ten years of investment, nine of research. The colour scale is built from every
+period rather than the one on screen, so 2016 renders visibly dimmer and a decade of
+growth reads as growth. Re-normalising per period would paint 2016's leader exactly as
+dark as 2025's, which is the one way a choropleth can fabricate a number. Choropleths are
+painted on demand into a six-entry LRU cache; at ~11 MB of texture memory each, holding
+all 23 layer/period combinations would cost about 250 MB.
 
 **The globe never rotates; the camera orbits.** World space and globe space stay
 identical, so a raycast hit converts straight to latitude and longitude with no rotation
@@ -203,6 +211,7 @@ matter how healthy the row counts look.
 | **Hover**          | Country, value and rank.                                          |
 | **Click**          | Fly to the country and open its detail panel.                     |
 | **`1`–`4`**        | Switch layer.                                                     |
+| **Scrubber**       | Step a layer through its history. Arrows step, Home/End jump.     |
 | **`←` `→`**        | Walk the ranking, camera following. Hold to tour the leaderboard. |
 | **`Home` / `End`** | Jump to best / worst rank.                                        |
 | **`Esc`**          | Close the panel.                                                  |
@@ -212,8 +221,9 @@ matter how healthy the row counts look.
 | **`/`**              | Focus search      |
 | **`↑` `↓`**          | Move between rows |
 
-Every view is a link: `/?layer=investment&country=BRA` ·
-`/compare?countries=USA,CHN,DEU`.
+Every view is a link: `/?layer=investment&period=2019&country=BRA` ·
+`/compare?countries=USA,CHN,DEU`. The period travels as its label, not an index, so the
+link still means 2019 after a future ingest adds an earlier year.
 
 ---
 
