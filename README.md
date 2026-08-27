@@ -16,30 +16,51 @@ surface — backed by a real ETL pipeline into Postgres, not a folder of JSON fi
 ## What this is
 
 Four dimensions of the global AI landscape — **adoption**, **investment**, **development**
-and **research** — painted onto a globe you can spin, click and read. Every figure on
-screen traces back to a row in a database, which traces back to a dated snapshot of a
-published dataset.
+and **research** — across 194 countries. Every figure on screen traces back to a row in a
+database, which traces back to a dated snapshot of a published dataset.
 
 There is no "overall AI score." Countries lead on different dimensions, and collapsing
 that into one number would be inventing a finding rather than showing one.
 
+```
+194 countries with data  ·  3,419 metric rows  ·  3,419 rankings  ·  1,052 models
+```
+
+---
+
+## Inside
+
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/country-panel.png" alt="United States selected on the investment layer, with a detail panel"></td>
-<td width="50%"><img src="docs/assets/research-layer.png" alt="The research layer, showing AI scholarly publications"></td>
+<td width="50%"><img src="docs/assets/country-panel.png" alt="The United States selected on the investment layer"></td>
+<td width="50%"><img src="docs/assets/country-page.png" alt="China's country page, showing four metrics and their history"></td>
 </tr>
 <tr>
-<td><b>Click a country</b> — the camera flies to it, the globe slides clear of the panel, and every layer's figure appears with its rank and period-over-period movement.</td>
-<td><b>Switch layers</b> — the whole globe crossfades to a new palette. Each dimension gets its own sequential ramp so it reads differently at a glance.</td>
+<td><b>The globe</b> — click a country and the camera flies to it, the globe slides clear of the panel, and every layer's figure appears with its rank and movement. Switching layers crossfades the whole sphere to a new palette.</td>
+<td><b>Country pages</b> — 194 of them, statically generated. The hero names the dimension that country actually leads on. Four metrics, their full history, and every notable AI model built there.</td>
+</tr>
+<tr>
+<td><img src="docs/assets/countries-table.png" alt="The ranked country table sorted by research output"></td>
+<td><img src="docs/assets/compare.png" alt="Four countries compared across all dimensions"></td>
+</tr>
+<tr>
+<td><b>The ranked index</b> — the same data as a table, sortable by any dimension and filterable by region. The globe is not the only route to the data, which is why this is a requirement rather than a nice-to-have.</td>
+<td><b>Compare</b> — up to four countries at once. Bars are percentile <i>within each dimension</i>, the only scale on which a share of adults, a sum in dollars and a count of papers honestly sit together.</td>
 </tr>
 </table>
+
+<div align="center">
+<img src="docs/assets/palette.png" alt="The command palette searching for countries" width="70%">
+<br>
+<sub><b>⌘K from anywhere</b> — every country, layer and page. 194 entries in under 10 KB, searched entirely on the client.</sub>
+</div>
 
 ---
 
 ## The data
 
 Four layers, all country-level, all verified against source before a line of UI was
-written. Coverage is the number of distinct countries the dataset carries.
+written. Coverage is the number of distinct countries each dataset carries.
 
 | Layer           | Source                                               | Countries | Period            |
 | --------------- | ---------------------------------------------------- | --------- | ----------------- |
@@ -47,10 +68,6 @@ written. Coverage is the number of distinct countries the dataset carries.
 | **Investment**  | CSET, via Our World in Data                          | 119       | 2016 – 2025       |
 | **Research**    | CSET / Stanford AI Index, via Our World in Data      | 190       | 2016 – 2024       |
 | **Development** | Epoch AI — Notable AI Models                         | 34        | 1950 – 2026       |
-
-```
-194 countries with data  ·  3,419 metric rows  ·  3,419 rankings  ·  1,052 models
-```
 
 The **development** layer covers only 34 countries, and the United States alone accounts
 for 676 of the 1,052 notable models. That concentration _is_ the finding — the map is
@@ -95,6 +112,11 @@ readback. That leaves the entire GPU budget for atmosphere, bloom and starfield.
 identical, so a raycast hit converts straight to latitude and longitude with no rotation
 to unwind.
 
+**Charts are hand-built React and SVG on d3 scales.** No chart library. Each plot carries
+a single series and therefore no legend — the four layers have incompatible units, and a
+shared axis would need a second y-scale whose alignment is arbitrary, inventing a
+correlation that is not in the data.
+
 **Rankings are precomputed at ingest.** Rank, previous rank, delta and percentile are
 written during the pipeline run, so rank-change animations cost an indexed lookup rather
 than a window function per request.
@@ -104,8 +126,8 @@ non-zero naming the file to edit. Aggregates like `World` and `Multinational` ar
 explicitly and filtered _before_ resolution, so a genuine miss is never mistaken for an
 expected skip. A quietly shrinking map looks completely fine until someone checks.
 
-**Country pages are static with ISR.** The database is off the critical render path;
-layer payloads are fetched in a server component and handed to the client as
+**Country pages are static with ISR.** 194 pages built in about 40 seconds; the database
+is off the critical render path. Layer payloads reach the client as
 `[iso3, value, rank, delta]` tuples — roughly 3 KB per layer instead of 40.
 
 > The full decision log, including two data-quality traps found during ingest, is in
@@ -115,16 +137,16 @@ layer payloads are fetched in a server component and handed to the client as
 
 ## Stack
 
-|               |                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| **Framework** | Next.js 16 (App Router, RSC) · React 19 · TypeScript strict                                      |
-| **3D**        | three.js · React Three Fiber · drei · postprocessing                                             |
-| **Styling**   | Tailwind CSS v4 · design tokens in one CSS file                                                  |
-| **Motion**    | Motion · custom camera damping · `prefers-reduced-motion` throughout                             |
-| **Data viz**  | d3 modules (`scale`, `geo`, `array`, `interpolate`) — charts hand-built in SVG, no chart library |
-| **State**     | Zustand · nuqs for URL-synced view state                                                         |
-| **Backend**   | Neon serverless Postgres · Drizzle ORM · Zod                                                     |
-| **Testing**   | Vitest · Playwright                                                                              |
+|               |                                                                          |
+| ------------- | ------------------------------------------------------------------------ |
+| **Framework** | Next.js 16 (App Router, RSC) · React 19 · TypeScript strict              |
+| **3D**        | three.js · React Three Fiber · drei · postprocessing · custom GLSL       |
+| **Styling**   | Tailwind CSS v4 · design tokens in one CSS file                          |
+| **Motion**    | Motion · custom camera damping · `prefers-reduced-motion` throughout     |
+| **Data viz**  | d3 modules (`scale`, `geo`, `shape`, `array`) — charts hand-built in SVG |
+| **State**     | Zustand · nuqs for URL-synced view state                                 |
+| **Backend**   | Neon serverless Postgres · Drizzle ORM · Zod                             |
+| **Testing**   | Vitest · Playwright                                                      |
 
 `noUncheckedIndexedAccess` is on. This project parses a lot of CSV, and it forces every
 indexed read to be checked rather than trusted.
@@ -171,7 +193,9 @@ matter how healthy the row counts look.
 
 ## Interaction
 
-|                    |                                                                   |
+**⌘K** or **Ctrl-K** anywhere searches every country, layer and page.
+
+| On the globe       |                                                                   |
 | ------------------ | ----------------------------------------------------------------- |
 | **Drag**           | Rotate. Idle rotation resumes after twelve seconds of quiet.      |
 | **Hover**          | Country, value and rank.                                          |
@@ -181,10 +205,13 @@ matter how healthy the row counts look.
 | **`Home` / `End`** | Jump to best / worst rank.                                        |
 | **`Esc`**          | Close the panel.                                                  |
 
-Every view is a link: `/?layer=investment&country=BRA`.
+| In the country table |                   |
+| -------------------- | ----------------- |
+| **`/`**              | Focus search      |
+| **`↑` `↓`**          | Move between rows |
 
-The globe is not the only path to the data — that is why keyboard navigation exists, and
-why the ranked country table is a V1 requirement rather than a nice-to-have.
+Every view is a link: `/?layer=investment&country=BRA` ·
+`/compare?countries=USA,CHN,DEU`.
 
 ---
 
@@ -192,16 +219,24 @@ why the ranked country table is a V1 requirement rather than a nice-to-have.
 
 ```
 src/
-  app/                    routes; the globe page is static + ISR
-  components/globe/       R3F scene, camera rig, HUD, shaders
-  components/ui/          shared primitives
-  lib/db/                 Drizzle schema, client, queries
-  lib/geo/                crosswalk, sphere maths, choropleth painter
-  lib/metrics/            metric registry, colour scales, formatters
-  styles/tokens.css       every colour, duration and type step
-scripts/ingest/           fetch -> validate -> resolve -> upsert
-data/snapshots/           dated source CSVs, committed
-docs/                     MASTER_PLAN.md, DECISIONS.md
+  app/
+    page.tsx                the globe; static + ISR
+    countries/              ranked index and 194 country pages
+    compare/                percentile comparison
+    about/                  the case study
+  components/
+    globe/                  R3F scene, camera rig, HUD, shaders
+    charts/                 mark specs, time series, sparkline, bars
+    panels/                 metric tiles, country table, compare board
+    ui/                     nav, command palette, animated figures
+  lib/
+    db/                     Drizzle schema, client, queries
+    geo/                    crosswalk, sphere maths, choropleth painter
+    metrics/                registry, colour scales, formatters
+  styles/tokens.css         every colour, duration and type step
+scripts/ingest/             fetch -> validate -> resolve -> upsert
+data/snapshots/             dated source CSVs, committed
+docs/                       MASTER_PLAN.md, DECISIONS.md
 ```
 
 Colour lives in exactly one file. Nothing outside `tokens.css` hard-codes a hex.
@@ -210,15 +245,19 @@ Colour lives in exactly one file. Nothing outside `tokens.css` hard-codes a hex.
 
 ## Status
 
-**V0 complete** — pipeline, schema and globe. Next: country detail pages, a ranked and
-fully keyboard-navigable country table, comparison across dimensions, and a trends view.
+The globe, country pages, the ranked index, compare, search and the case-study page are
+built, along with sitemap, robots, per-country social images, and error and loading
+states. 55 tests; a production build of 205 pages takes about a minute.
 
-One design question is parked deliberately. Microsoft's adoption estimates are modelled,
-and low-data countries are imputed in regional blocks — twelve West African countries
-share exactly 10.1%. Rank movement inside such a block is an artefact of the model, not a
-national trend, so "fastest rising" needs an honest answer before it ships as a headline.
-That reasoning is written down in [`docs/DECISIONS.md`](docs/DECISIONS.md) rather than
-discovered later.
+**Two things are deliberately unbuilt.** A "fastest rising" view is on hold: the adoption
+estimates are modelled, and low-data countries are imputed in regional blocks — twelve
+West African countries share exactly 10.1%. Rank movement inside such a block is an
+artefact of the model, not a national trend, so the feature needs an honest answer before
+it ships. Company profiles are also outstanding; there is no free funding API worth
+trusting, so they will be hand-curated and labelled as such.
+
+The reasoning for both is written down in [`docs/DECISIONS.md`](docs/DECISIONS.md) rather
+than discovered later.
 
 ---
 
