@@ -48,7 +48,7 @@ export const METRIC_DEFS: MetricDef[] = [
     aggregation: "latest",
     methodologyNote:
       "Microsoft AI Economy Institute estimates, republished by Our World in Data " +
-      "with ISO3 codes. Covers 147 countries across three periods. " +
+      "with ISO3 codes. 147 countries, all three periods. " +
       "IMPORTANT: values are modelled, and low-data countries are imputed in " +
       "regional blocks — 12 West African countries share exactly 10.1% and the " +
       "four Guianas share exactly 10.3%. Rank movements inside those blocks are " +
@@ -67,7 +67,8 @@ export const METRIC_DEFS: MetricDef[] = [
     sourceId: "private-investment-in-artificial-intelligence-cset",
     aggregation: "latest",
     methodologyNote:
-      "CSET estimates. Covers 119 countries, 2016–2025. Absolute totals, not " +
+      "CSET estimates. 119 countries appear across 2016–2025, fewer in any single " +
+      "year. Absolute totals, not " +
       "population-adjusted — small economies rank low by construction.",
   },
   {
@@ -83,7 +84,8 @@ export const METRIC_DEFS: MetricDef[] = [
     sourceId: "annual-scholarly-publications-on-artificial-intelligence",
     aggregation: "latest",
     methodologyNote:
-      "Covers 190 countries, 2016–2024. Best country coverage in the project. " +
+      "190 countries appear across 2016–2024, fewer in any single year — the " +
+      "header above counts the latest year only. Best coverage in the project. " +
       "Includes Kosovo, which OWID codes as OWID_KOS and which has no ISO numeric — " +
       "it appears in tables and rankings but cannot be picked on the globe.",
   },

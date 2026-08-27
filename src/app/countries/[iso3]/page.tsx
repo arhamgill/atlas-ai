@@ -14,7 +14,18 @@ import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
  * the product.
  */
 export const revalidate = 3600;
-export const dynamicParams = true;
+
+/**
+ * Only the countries that actually have data get a page, and anything else is
+ * a real 404.
+ *
+ * With dynamicParams enabled, Next renders unknown paths on demand — and
+ * because generateMetadata resolved before the page threw notFound(), the
+ * response had already committed a 200. /countries/zzz served the not-found
+ * body under a 200 status, which is exactly what a crawler indexes as a valid
+ * page. Restricting to prebuilt params makes the status honest.
+ */
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const iso3 = await getCountriesWithData();

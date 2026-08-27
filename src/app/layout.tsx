@@ -3,6 +3,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import { SiteNav } from "@/components/ui/SiteNav";
 import { getSearchIndex } from "@/lib/db/queries";
+import { SITE_ORIGIN } from "@/lib/site";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -19,6 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_ORIGIN),
   title: {
     default: "AI Atlas — The global AI race, visualized",
     template: "%s · AI Atlas",
@@ -26,6 +28,14 @@ export const metadata: Metadata = {
   description:
     "An interactive intelligence platform for exploring global AI adoption, investment, research and development across 189 countries.",
   applicationName: "AI Atlas",
+  openGraph: {
+    type: "website",
+    siteName: "AI Atlas",
+    title: "AI Atlas — The global AI race, visualized",
+    description:
+      "An interactive globe over verified data on AI adoption, investment, research and model development across 194 countries.",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
