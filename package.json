@@ -74,6 +74,7 @@
     "@types/topojson-client": "^3.1.5",
     "@types/topojson-specification": "^1.0.5",
     "@vitejs/plugin-react": "^6.1.0",
+    "@xmldom/xmldom": "^0.9.12",
     "cross-env": "^10.1.0",
     "csv-parse": "^7.0.2",
     "dotenv": "^17.4.2",

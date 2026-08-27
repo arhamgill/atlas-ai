@@ -1,5 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="AI Atlas">
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="AI Atlas">
   <title>AI Atlas</title>
+
+  <!--
+    A double hyphen is illegal inside an XML comment, so the design tokens
+    are named without their leading dashes here. Get it wrong and the file
+    stops being well-formed XML: browsers silently refuse to render it as a
+    favicon, while HTML previews still look perfectly fine.
+  -->
   <defs>
     <!-- Lit from the upper left, matching the globe's own light direction. -->
     <radialGradient id="sphere" cx="36%" cy="30%" r="78%">
@@ -9,7 +16,7 @@
     </radialGradient>
   </defs>
 
-  <!-- --bg-base, so the mark sits on its own ground in light and dark chrome. -->
+  <!-- bg-base token, so the mark carries its own ground in any browser chrome. -->
   <rect width="32" height="32" rx="7" fill="#07080a" />
 
   <!-- Sphere in the adoption ramp: the default layer's colour. -->
@@ -24,7 +31,7 @@
     <ellipse cx="16" cy="16" rx="4.4" ry="11.2" />
   </g>
 
-  <!-- --accent, standing in for the atmosphere that rims the real globe. -->
+  <!-- accent token, standing in for the atmosphere that rims the real globe. -->
   <circle
     cx="16"
     cy="16"
