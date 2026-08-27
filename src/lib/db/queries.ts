@@ -630,3 +630,52 @@ export async function getSearchIndex(): Promise<SearchEntry[]> {
     .orderBy(countries.name);
   return rows.map((r) => ({ ...r, iso3: r.iso3.trim() }));
 }
+
+/* ---------------------------------------------------------------------------
+ * Peers
+ * ------------------------------------------------------------------------- */
+
+export interface Peer {
+  iso3: string;
+  name: string;
+  rank: number;
+  value: number;
+}
+
+/**
+ * The countries immediately above and below one country in a ranking.
+ *
+ * A country page with no outbound links is a dead end: you arrive from the
+ * globe or the table and there is nowhere to go except back. Neighbours in the
+ * ranking are the most useful next click, because they are the ones actually
+ * worth comparing against.
+ */
+export async function getPeers(
+  metricKey: string,
+  iso3: string,
+  spread = 2,
+): Promise<Peer[]> {
+  const { byCountry } = await aggregateMetric(metricKey);
+  const self = byCountry.get(iso3.toUpperCase());
+  if (!self) return [];
+
+  const names = new Map(
+    (
+      await db.select({ iso3: countries.iso3, name: countries.name }).from(countries)
+    ).map((c) => [c.iso3.trim(), c.name]),
+  );
+
+  return [...byCountry.entries()]
+    .filter(
+      ([code, a]) =>
+        code !== iso3.toUpperCase() && Math.abs(a.rank - self.rank) <= spread,
+    )
+    .sort((a, b) => a[1].rank - b[1].rank)
+    .slice(0, spread * 2)
+    .map(([code, a]) => ({
+      iso3: code,
+      name: names.get(code) ?? code,
+      rank: a.rank,
+      value: a.value,
+    }));
+}

@@ -6,8 +6,9 @@ import { layerColor } from "@/components/charts/primitives";
 import { CountryLocator } from "@/components/panels/CountryLocator";
 import { MetricTile } from "@/components/panels/MetricTile";
 import { ModelsTable } from "@/components/panels/ModelsTable";
+import { PeerStrip } from "@/components/panels/PeerStrip";
 import { Reveal } from "@/components/ui/Reveal";
-import { getCountriesWithData, getCountryDetail } from "@/lib/db/queries";
+import { getCountriesWithData, getCountryDetail, getPeers } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
 
 /**
@@ -91,6 +92,11 @@ export default async function CountryPage({
   const uncovered = country.metrics.filter((m) => m.latest === null);
 
   const charts = country.metrics.filter((m) => m.series.length >= 2);
+
+  // Peers on the country's own strongest dimension — the ranking where it is
+  // most interesting to see who sits either side of it.
+  const peers =
+    strongest?.latest?.rank != null ? await getPeers(strongest.key, country.iso3) : [];
 
   return (
     <main className="mx-auto w-full max-w-[var(--shell-max)] px-4 pt-24 pb-24 sm:px-8">
@@ -240,6 +246,21 @@ export default async function CountryPage({
 
           <ModelsTable models={country.models} total={country.modelCount} />
         </section>
+      )}
+
+      {strongest?.latest?.rank != null && (
+        <PeerStrip
+          peers={peers}
+          self={{
+            iso3: country.iso3,
+            name: country.name,
+            rank: strongest.latest.rank,
+          }}
+          metricLabel={strongest.shortLabel}
+          layer={strongest.layer}
+          unit={strongest.unit}
+          precision={strongest.precision}
+        />
       )}
 
       {/* ---------- Provenance ---------- */}
