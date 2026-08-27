@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
+import { Sparkline } from "@/components/charts/Sparkline";
 import { layerColor } from "@/components/charts/primitives";
-import type { CountryTable as TableData } from "@/lib/db/queries";
+import type { CompareSeries, CountryTable as TableData } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
 
 const MAX = 4;
@@ -17,7 +18,14 @@ function percentile(rank: number | null, total: number): number | null {
   return 1 - (rank - 1) / (total - 1);
 }
 
-export function CompareBoard({ data }: { data: TableData }) {
+export function CompareBoard({
+  data,
+  series,
+}: {
+  data: TableData;
+  /** iso3 -> metric key -> that country's history on the metric's period grid. */
+  series: Record<string, Record<string, CompareSeries>>;
+}) {
   const [param, setParam] = useQueryState("countries", { history: "replace" });
   const [query, setQuery] = useState("");
 
@@ -145,64 +153,77 @@ export function CompareBoard({ data }: { data: TableData }) {
               </thead>
 
               <tbody>
-                {data.layers.map((layer) => (
-                  <tr
-                    key={layer.key}
-                    className="border-t border-[var(--border-subtle)] align-top"
-                  >
-                    <th scope="row" className="py-5 pr-6 text-left">
-                      <span className="flex items-center gap-2">
-                        <span
-                          className="inline-block size-2 rounded-[2px]"
-                          style={{ background: layerColor(layer.layer, 4) }}
-                        />
-                        <span className="text-sm font-medium text-[var(--text-primary)]">
-                          {layer.shortLabel}
+                {data.layers.map((layer) => {
+                  return (
+                    <tr
+                      key={layer.key}
+                      className="border-t border-[var(--border-subtle)] align-top"
+                    >
+                      <th scope="row" className="py-5 pr-6 text-left">
+                        <span className="flex items-center gap-2">
+                          <span
+                            className="inline-block size-2 rounded-[2px]"
+                            style={{ background: layerColor(layer.layer, 4) }}
+                          />
+                          <span className="text-sm font-medium text-[var(--text-primary)]">
+                            {layer.shortLabel}
+                          </span>
                         </span>
-                      </span>
-                      <span className="numeric text-2xs mt-1 block font-normal text-[var(--text-tertiary)]">
-                        {formatPeriod(layer.period)} · {layer.total} countries
-                      </span>
-                    </th>
+                        <span className="numeric text-2xs mt-1 block font-normal text-[var(--text-tertiary)]">
+                          {formatPeriod(layer.period)} · {layer.total} countries
+                        </span>
+                      </th>
 
-                    {selected.map((c) => {
-                      const v = c.values[layer.key];
-                      const pct = v ? percentile(v.rank, layer.total) : null;
-                      return (
-                        <td key={c.iso3} className="py-5 pr-6">
-                          {v ? (
-                            <>
-                              <span className="numeric block text-[length:var(--text-lg)] leading-none">
-                                {formatMetric(v.value, layer.unit, layer.precision)}
-                              </span>
-                              <span className="numeric text-2xs mt-1.5 block text-[var(--text-tertiary)]">
-                                #{v.rank} of {layer.total}
-                              </span>
-                              <span
-                                className="mt-2.5 block h-1.5 w-full max-w-[180px] overflow-hidden rounded-full"
-                                style={{ background: layerColor(layer.layer, 1) }}
-                                role="img"
-                                aria-label={`${Math.round((pct ?? 0) * 100)}th percentile`}
-                              >
+                      {selected.map((c) => {
+                        const v = c.values[layer.key];
+                        const pct = v ? percentile(v.rank, layer.total) : null;
+                        return (
+                          <td key={c.iso3} className="py-5 pr-6">
+                            {v ? (
+                              <>
+                                <span className="numeric block text-[length:var(--text-lg)] leading-none">
+                                  {formatMetric(v.value, layer.unit, layer.precision)}
+                                </span>
+                                <span className="numeric text-2xs mt-1.5 block text-[var(--text-tertiary)]">
+                                  #{v.rank} of {layer.total}
+                                </span>
+                                <span className="mt-2 block">
+                                  <Sparkline
+                                    values={series[c.iso3]?.[layer.key]?.values ?? []}
+                                    slots={series[c.iso3]?.[layer.key]?.slots}
+                                    gridLength={series[c.iso3]?.[layer.key]?.gridLength}
+                                    layer={layer.layer}
+                                    width={150}
+                                    height={26}
+                                    ariaLabel={`${c.name} ${layer.shortLabel} over time`}
+                                  />
+                                </span>
                                 <span
-                                  className="block h-full rounded-full"
-                                  style={{
-                                    width: `${Math.max(2, (pct ?? 0) * 100)}%`,
-                                    background: layerColor(layer.layer, 4),
-                                  }}
-                                />
+                                  className="mt-2.5 block h-1.5 w-full max-w-[180px] overflow-hidden rounded-full"
+                                  style={{ background: layerColor(layer.layer, 1) }}
+                                  role="img"
+                                  aria-label={`${Math.round((pct ?? 0) * 100)}th percentile`}
+                                >
+                                  <span
+                                    className="block h-full rounded-full"
+                                    style={{
+                                      width: `${Math.max(2, (pct ?? 0) * 100)}%`,
+                                      background: layerColor(layer.layer, 4),
+                                    }}
+                                  />
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-sm text-[var(--no-data-text)]">
+                                No data
                               </span>
-                            </>
-                          ) : (
-                            <span className="text-sm text-[var(--no-data-text)]">
-                              No data
-                            </span>
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

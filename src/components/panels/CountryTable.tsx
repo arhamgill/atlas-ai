@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { BarCell } from "@/components/charts/BarCell";
+import { Histogram } from "@/components/charts/Histogram";
 import { layerColor } from "@/components/charts/primitives";
 import type { CountryTable as TableData } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
@@ -208,6 +209,11 @@ export function CountryTable({ data }: { data: TableData }) {
                     {l.shortLabel}
                     {sort === l.key && <span aria-hidden>↓</span>}
                   </button>
+                  {/* The shape of the whole column, so a row's bar can be read
+                      as typical or unusual rather than just long or short. */}
+                  <span className="mt-1.5 block">
+                    <Histogram bins={l.distribution} layer={l.layer} />
+                  </span>
                 </th>
               ))}
             </tr>

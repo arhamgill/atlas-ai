@@ -14,12 +14,21 @@ export function Sparkline({
   width = 92,
   height = 28,
   ariaLabel,
+  slots,
+  gridLength,
 }: {
   values: number[];
   layer: string | null;
   width?: number;
   height?: number;
   ariaLabel?: string;
+  /**
+   * Where each value sits on a shared period grid, and how long that grid is.
+   * Without these a country missing four of ten years still spans the full
+   * width, putting different years above each other in a compare row.
+   */
+  slots?: number[];
+  gridLength?: number;
 }) {
   if (values.length < 2) {
     return (
@@ -34,9 +43,15 @@ export function Sparkline({
   }
 
   const pad = DOT_R + 1;
-  const x = scalePoint<number>()
-    .domain(values.map((_, i) => i))
-    .range([pad, width - pad]);
+  const xScale =
+    gridLength && gridLength > 1
+      ? scaleLinear()
+          .domain([0, gridLength - 1])
+          .range([pad, width - pad])
+      : scalePoint<number>()
+          .domain(values.map((_, i) => i))
+          .range([pad, width - pad]);
+  const x = (i: number) => xScale((slots?.[i] ?? i) as number & never) ?? 0;
   const min = Math.min(...values);
   const max = Math.max(...values);
   // A flat series should sit on the centre line, not collapse onto the floor.
@@ -49,7 +64,7 @@ export function Sparkline({
 
   const path =
     d3line<number>()
-      .x((_, i) => x(i) ?? 0)
+      .x((_, i) => x(i))
       .y((v) => y(v))
       .curve(curveMonotoneX)(values) ?? "";
 

@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { METRICS_BY_KEY } from "../metrics/registry";
 import { countries, metricDefs, metrics, models, rankings } from "./schema";
 import { db } from "./client";
@@ -518,6 +518,8 @@ export interface CountryTable {
     total: number;
     max: number;
     min: number;
+    /** Counts per bin across all countries, for the column-header histogram. */
+    distribution: number[];
   }[];
 }
 
@@ -581,6 +583,22 @@ export async function getCountryTable(): Promise<CountryTable> {
   const layers = defs.map((d, i) => {
     const agg = aggregated[i];
     const values = agg ? [...agg.byCountry.values()].map((a) => a.value) : [];
+    const max = values.length ? Math.max(...values) : 1;
+    const min = values.length ? Math.min(...values) : 0;
+
+    /*
+     * Binned on a square-root scale, matching the inline bars. On a linear
+     * scale every metric except adoption piles into the first bin and the
+     * histogram becomes a single spike that says nothing.
+     */
+    const BINS = 14;
+    const distribution = new Array<number>(BINS).fill(0);
+    for (const v of values) {
+      const t = max > 0 ? Math.sqrt(Math.max(0, v) / max) : 0;
+      const i = Math.min(BINS - 1, Math.floor(t * BINS));
+      distribution[i] = (distribution[i] ?? 0) + 1;
+    }
+
     return {
       key: d.key,
       layer: d.layer ?? "",
@@ -590,8 +608,9 @@ export async function getCountryTable(): Promise<CountryTable> {
       precision: d.precision,
       period: agg?.period ?? d.latest,
       total: values.length,
-      max: values.length ? Math.max(...values) : 1,
-      min: values.length ? Math.min(...values) : 0,
+      max,
+      min,
+      distribution,
     };
   });
 
@@ -678,4 +697,103 @@ export async function getPeers(
       rank: a.rank,
       value: a.value,
     }));
+}
+
+/* ---------------------------------------------------------------------------
+ * Compare series
+ * ------------------------------------------------------------------------- */
+
+/**
+ * One country's history of one metric, positioned on that metric's shared
+ * period grid.
+ *
+ * `slots[i]` is the index of `values[i]` in the grid, which is what makes the
+ * sparklines in a compare row comparable: coverage is ragged (64 of 119
+ * countries are missing at least one investment year), so plotting each series
+ * across its own full width would put different years above each other.
+ */
+export interface CompareSeries {
+  values: number[];
+  slots: number[];
+  gridLength: number;
+}
+
+/**
+ * Full history per metric for a handful of countries, aligned for comparison.
+ *
+ * Only for the countries actually selected — shipping every country's series to
+ * the compare page would be tens of kilobytes to render at most four columns.
+ * The page therefore re-renders on the server when the selection changes, which
+ * is why its URL state is not shallow.
+ */
+export async function getCompareSeries(
+  iso3List: string[],
+): Promise<Record<string, Record<string, CompareSeries>>> {
+  const codes = iso3List.map((c) => c.trim().toUpperCase()).filter(Boolean);
+  if (codes.length === 0) return {};
+
+  // The grid comes from every country, not just the selected ones — otherwise
+  // the x-axis would silently change meaning as the selection changed.
+  const [gridRows, rows] = await Promise.all([
+    db
+      .selectDistinct({ metricKey: metrics.metricKey, period: metrics.period })
+      .from(metrics)
+      .orderBy(metrics.metricKey, metrics.period),
+    db
+      .select({
+        iso3: metrics.countryIso3,
+        metricKey: metrics.metricKey,
+        period: metrics.period,
+        value: metrics.value,
+      })
+      .from(metrics)
+      .where(inArray(metrics.countryIso3, codes))
+      .orderBy(metrics.countryIso3, metrics.metricKey, metrics.period),
+  ]);
+
+  const grid = new Map<string, Map<string, number>>();
+  for (const g of gridRows) {
+    const m = (grid.get(g.metricKey) ??
+      grid.set(g.metricKey, new Map()).get(g.metricKey))!;
+    m.set(g.period, m.size);
+  }
+
+  const out: Record<string, Record<string, CompareSeries>> = {};
+  for (const r of rows) {
+    const iso3 = r.iso3.trim();
+    const slot = grid.get(r.metricKey)?.get(r.period);
+    if (slot === undefined) continue;
+    const byMetric = (out[iso3] ??= {});
+    const s = (byMetric[r.metricKey] ??= {
+      values: [],
+      slots: [],
+      gridLength: grid.get(r.metricKey)!.size,
+    });
+    s.values.push(r.value);
+    s.slots.push(slot);
+  }
+
+  /*
+   * A "total" metric's headline figure is the all-time sum, so its sparkline has
+   * to be the running total or the line would end somewhere other than the
+   * number printed above it. Cumulating also fills the gaps honestly: a country
+   * with no models before 2019 genuinely had none.
+   */
+  for (const byMetric of Object.values(out)) {
+    for (const [key, s] of Object.entries(byMetric)) {
+      if (METRICS_BY_KEY.get(key)?.aggregation !== "total") continue;
+      let running = 0;
+      const values: number[] = [];
+      const slots: number[] = [];
+      for (let i = 0; i < s.gridLength; i++) {
+        const at = s.slots.indexOf(i);
+        if (at !== -1) running += s.values[at] ?? 0;
+        values.push(running);
+        slots.push(i);
+      }
+      byMetric[key] = { values, slots, gridLength: s.gridLength };
+    }
+  }
+
+  return out;
 }
