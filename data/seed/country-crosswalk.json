@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24",
+  "generatedAt": "2026-08-27",
   "countries": [
     {
       "iso3": "ABW",
@@ -11,7 +11,10 @@
       "subregion": "Caribbean",
       "lat": 12.5,
       "lng": -69.96666666,
-      "aliases": ["ABW", "Aruba"]
+      "aliases": [
+        "ABW",
+        "Aruba"
+      ]
     },
     {
       "iso3": "AFG",
@@ -23,7 +26,12 @@
       "subregion": "Southern Asia",
       "lat": 33,
       "lng": 65,
-      "aliases": ["AFG", "Afghanistan", "Afġānistān", "Islamic Republic of Afghanistan"]
+      "aliases": [
+        "AFG",
+        "Afghanistan",
+        "Afġānistān",
+        "Islamic Republic of Afghanistan"
+      ]
     },
     {
       "iso3": "AGO",
@@ -53,7 +61,10 @@
       "subregion": "Caribbean",
       "lat": 18.25,
       "lng": -63.16666666,
-      "aliases": ["AIA", "Anguilla"]
+      "aliases": [
+        "AIA",
+        "Anguilla"
+      ]
     },
     {
       "iso3": "ALA",
@@ -65,7 +76,13 @@
       "subregion": "Northern Europe",
       "lat": 60.116667,
       "lng": 19.9,
-      "aliases": ["ALA", "Aaland", "Ahvenanmaa", "Aland", "Åland Islands"]
+      "aliases": [
+        "ALA",
+        "Aaland",
+        "Ahvenanmaa",
+        "Aland",
+        "Åland Islands"
+      ]
     },
     {
       "iso3": "ALB",
@@ -96,7 +113,12 @@
       "subregion": "Southern Europe",
       "lat": 42.5,
       "lng": 1.5,
-      "aliases": ["AND", "Andorra", "Principality of Andorra", "Principat d'Andorra"]
+      "aliases": [
+        "AND",
+        "Andorra",
+        "Principality of Andorra",
+        "Principat d'Andorra"
+      ]
     },
     {
       "iso3": "ARE",
@@ -108,7 +130,12 @@
       "subregion": "Western Asia",
       "lat": 24,
       "lng": 54,
-      "aliases": ["ARE", "Emirates", "UAE", "United Arab Emirates"]
+      "aliases": [
+        "ARE",
+        "Emirates",
+        "UAE",
+        "United Arab Emirates"
+      ]
     },
     {
       "iso3": "ARG",
@@ -120,7 +147,12 @@
       "subregion": "South America",
       "lat": -34,
       "lng": -64,
-      "aliases": ["ARG", "Argentina", "Argentine Republic", "República Argentina"]
+      "aliases": [
+        "ARG",
+        "Argentina",
+        "Argentine Republic",
+        "República Argentina"
+      ]
     },
     {
       "iso3": "ARM",
@@ -168,7 +200,10 @@
       "subregion": null,
       "lat": -90,
       "lng": 0,
-      "aliases": ["ATA", "Antarctica"]
+      "aliases": [
+        "ATA",
+        "Antarctica"
+      ]
     },
     {
       "iso3": "ATF",
@@ -197,7 +232,10 @@
       "subregion": "Caribbean",
       "lat": 17.05,
       "lng": -61.8,
-      "aliases": ["ATG", "Antigua and Barbuda"]
+      "aliases": [
+        "ATG",
+        "Antigua and Barbuda"
+      ]
     },
     {
       "iso3": "AUS",
@@ -209,7 +247,11 @@
       "subregion": "Australia and New Zealand",
       "lat": -27,
       "lng": 133,
-      "aliases": ["AUS", "Australia", "Commonwealth of Australia"]
+      "aliases": [
+        "AUS",
+        "Australia",
+        "Commonwealth of Australia"
+      ]
     },
     {
       "iso3": "AUT",
@@ -221,7 +263,13 @@
       "subregion": "Central Europe",
       "lat": 47.33333333,
       "lng": 13.33333333,
-      "aliases": ["AUT", "Austria", "Oesterreich", "Osterreich", "Republic of Austria"]
+      "aliases": [
+        "AUT",
+        "Austria",
+        "Oesterreich",
+        "Osterreich",
+        "Republic of Austria"
+      ]
     },
     {
       "iso3": "AZE",
@@ -291,7 +339,12 @@
       "subregion": "Western Africa",
       "lat": 9.5,
       "lng": 2.25,
-      "aliases": ["BEN", "Benin", "Republic of Benin", "République du Bénin"]
+      "aliases": [
+        "BEN",
+        "Benin",
+        "Republic of Benin",
+        "République du Bénin"
+      ]
     },
     {
       "iso3": "BES",
@@ -321,7 +374,10 @@
       "subregion": "Western Africa",
       "lat": 13,
       "lng": -2,
-      "aliases": ["BFA", "Burkina Faso"]
+      "aliases": [
+        "BFA",
+        "Burkina Faso"
+      ]
     },
     {
       "iso3": "BGD",
@@ -350,7 +406,12 @@
       "subregion": "Southeast Europe",
       "lat": 43,
       "lng": 25,
-      "aliases": ["BGR", "Bulgaria", "Republic of Bulgaria", "Република България"]
+      "aliases": [
+        "BGR",
+        "Bulgaria",
+        "Republic of Bulgaria",
+        "Република България"
+      ]
     },
     {
       "iso3": "BHR",
@@ -362,7 +423,12 @@
       "subregion": "Western Asia",
       "lat": 26,
       "lng": 50.55,
-      "aliases": ["BHR", "Bahrain", "Kingdom of Bahrain", "Mamlakat al-Baḥrayn"]
+      "aliases": [
+        "BHR",
+        "Bahrain",
+        "Kingdom of Bahrain",
+        "Mamlakat al-Baḥrayn"
+      ]
     },
     {
       "iso3": "BHS",
@@ -374,7 +440,12 @@
       "subregion": "Caribbean",
       "lat": 24.25,
       "lng": -76,
-      "aliases": ["BHS", "Bahamas", "Bahamas, The", "Commonwealth of the Bahamas"]
+      "aliases": [
+        "BHS",
+        "Bahamas",
+        "Bahamas, The",
+        "Commonwealth of the Bahamas"
+      ]
     },
     {
       "iso3": "BIH",
@@ -440,7 +511,10 @@
       "subregion": "Central America",
       "lat": 17.25,
       "lng": -88.75,
-      "aliases": ["BLZ", "Belize"]
+      "aliases": [
+        "BLZ",
+        "Belize"
+      ]
     },
     {
       "iso3": "BMU",
@@ -512,7 +586,10 @@
       "subregion": "Caribbean",
       "lat": 13.16666666,
       "lng": -59.53333333,
-      "aliases": ["BRB", "Barbados"]
+      "aliases": [
+        "BRB",
+        "Barbados"
+      ]
     },
     {
       "iso3": "BRN",
@@ -543,7 +620,11 @@
       "subregion": "Southern Asia",
       "lat": 27.5,
       "lng": 90.5,
-      "aliases": ["BTN", "Bhutan", "Kingdom of Bhutan"]
+      "aliases": [
+        "BTN",
+        "Bhutan",
+        "Kingdom of Bhutan"
+      ]
     },
     {
       "iso3": "BVT",
@@ -555,7 +636,12 @@
       "subregion": null,
       "lat": -54.43333333,
       "lng": 3.4,
-      "aliases": ["BVT", "Bouvet Island", "Bouvet-øya", "Bouvetøya"]
+      "aliases": [
+        "BVT",
+        "Bouvet Island",
+        "Bouvet-øya",
+        "Bouvetøya"
+      ]
     },
     {
       "iso3": "BWA",
@@ -567,7 +653,12 @@
       "subregion": "Southern Africa",
       "lat": -22,
       "lng": 24,
-      "aliases": ["BWA", "Botswana", "Lefatshe la Botswana", "Republic of Botswana"]
+      "aliases": [
+        "BWA",
+        "Botswana",
+        "Lefatshe la Botswana",
+        "Republic of Botswana"
+      ]
     },
     {
       "iso3": "CAF",
@@ -596,7 +687,10 @@
       "subregion": "North America",
       "lat": 60,
       "lng": -95,
-      "aliases": ["CAN", "Canada"]
+      "aliases": [
+        "CAN",
+        "Canada"
+      ]
     },
     {
       "iso3": "CCK",
@@ -646,7 +740,12 @@
       "subregion": "South America",
       "lat": -30,
       "lng": -71,
-      "aliases": ["CHL", "Chile", "Republic of Chile", "República de Chile"]
+      "aliases": [
+        "CHL",
+        "Chile",
+        "Republic of Chile",
+        "República de Chile"
+      ]
     },
     {
       "iso3": "CHN",
@@ -698,7 +797,12 @@
       "subregion": "Middle Africa",
       "lat": 6,
       "lng": 12,
-      "aliases": ["CMR", "Cameroon", "Republic of Cameroon", "République du Cameroun"]
+      "aliases": [
+        "CMR",
+        "Cameroon",
+        "Republic of Cameroon",
+        "République du Cameroun"
+      ]
     },
     {
       "iso3": "COD",
@@ -749,7 +853,11 @@
       "subregion": "Polynesia",
       "lat": -21.23333333,
       "lng": -159.76666666,
-      "aliases": ["COK", "Cook Islands", "Kūki 'Āirani"]
+      "aliases": [
+        "COK",
+        "Cook Islands",
+        "Kūki 'Āirani"
+      ]
     },
     {
       "iso3": "COL",
@@ -761,7 +869,12 @@
       "subregion": "South America",
       "lat": 4,
       "lng": -72,
-      "aliases": ["COL", "Colombia", "Republic of Colombia", "República de Colombia"]
+      "aliases": [
+        "COL",
+        "Colombia",
+        "Republic of Colombia",
+        "República de Colombia"
+      ]
     },
     {
       "iso3": "COM",
@@ -826,7 +939,12 @@
       "subregion": "Caribbean",
       "lat": 21.5,
       "lng": -80,
-      "aliases": ["CUB", "Cuba", "Republic of Cuba", "República de Cuba"]
+      "aliases": [
+        "CUB",
+        "Cuba",
+        "Republic of Cuba",
+        "República de Cuba"
+      ]
     },
     {
       "iso3": "CUW",
@@ -858,7 +976,11 @@
       "subregion": "Australia and New Zealand",
       "lat": -10.5,
       "lng": 105.66666666,
-      "aliases": ["CXR", "Christmas Island", "Territory of Christmas Island"]
+      "aliases": [
+        "CXR",
+        "Christmas Island",
+        "Territory of Christmas Island"
+      ]
     },
     {
       "iso3": "CYM",
@@ -870,7 +992,10 @@
       "subregion": "Caribbean",
       "lat": 19.5,
       "lng": -80.5,
-      "aliases": ["CYM", "Cayman Islands"]
+      "aliases": [
+        "CYM",
+        "Cayman Islands"
+      ]
     },
     {
       "iso3": "CYP",
@@ -902,7 +1027,13 @@
       "subregion": "Central Europe",
       "lat": 49.75,
       "lng": 15.5,
-      "aliases": ["CZE", "Czech Republic", "Czechia", "Česko", "Česká republika"]
+      "aliases": [
+        "CZE",
+        "Czech Republic",
+        "Czechia",
+        "Česko",
+        "Česká republika"
+      ]
     },
     {
       "iso3": "DEU",
@@ -988,7 +1119,10 @@
       "subregion": "Caribbean",
       "lat": 19,
       "lng": -70.66666666,
-      "aliases": ["DOM", "Dominican Republic"]
+      "aliases": [
+        "DOM",
+        "Dominican Republic"
+      ]
     },
     {
       "iso3": "DZA",
@@ -1018,7 +1152,12 @@
       "subregion": "South America",
       "lat": -2,
       "lng": -77.5,
-      "aliases": ["ECU", "Ecuador", "Republic of Ecuador", "República del Ecuador"]
+      "aliases": [
+        "ECU",
+        "Ecuador",
+        "Republic of Ecuador",
+        "República del Ecuador"
+      ]
     },
     {
       "iso3": "EGY",
@@ -1030,7 +1169,12 @@
       "subregion": "Northern Africa",
       "lat": 27,
       "lng": 30,
-      "aliases": ["Arab Republic of Egypt", "EGY", "Egypt", "Egypt, Arab Rep."]
+      "aliases": [
+        "Arab Republic of Egypt",
+        "EGY",
+        "Egypt",
+        "Egypt, Arab Rep."
+      ]
     },
     {
       "iso3": "ERI",
@@ -1079,7 +1223,12 @@
       "subregion": "Southern Europe",
       "lat": 40,
       "lng": -4,
-      "aliases": ["ESP", "Kingdom of Spain", "Reino de España", "Spain"]
+      "aliases": [
+        "ESP",
+        "Kingdom of Spain",
+        "Reino de España",
+        "Spain"
+      ]
     },
     {
       "iso3": "EST",
@@ -1091,7 +1240,13 @@
       "subregion": "Northern Europe",
       "lat": 59,
       "lng": 26,
-      "aliases": ["EST", "Eesti", "Eesti Vabariik", "Estonia", "Republic of Estonia"]
+      "aliases": [
+        "EST",
+        "Eesti",
+        "Eesti Vabariik",
+        "Estonia",
+        "Republic of Estonia"
+      ]
     },
     {
       "iso3": "ETH",
@@ -1176,7 +1331,12 @@
       "subregion": "Western Europe",
       "lat": 46,
       "lng": 2,
-      "aliases": ["FRA", "France", "French Republic", "République française"]
+      "aliases": [
+        "FRA",
+        "France",
+        "French Republic",
+        "République française"
+      ]
     },
     {
       "iso3": "FRO",
@@ -1188,7 +1348,13 @@
       "subregion": "Northern Europe",
       "lat": 62,
       "lng": -7,
-      "aliases": ["FRO", "Faeroe Islands", "Faroe Islands", "Færøerne", "Føroyar"]
+      "aliases": [
+        "FRO",
+        "Faeroe Islands",
+        "Faroe Islands",
+        "Færøerne",
+        "Føroyar"
+      ]
     },
     {
       "iso3": "FSM",
@@ -1219,7 +1385,12 @@
       "subregion": "Middle Africa",
       "lat": -1,
       "lng": 11.75,
-      "aliases": ["GAB", "Gabon", "Gabonese Republic", "République Gabonaise"]
+      "aliases": [
+        "GAB",
+        "Gabon",
+        "Gabonese Republic",
+        "République Gabonaise"
+      ]
     },
     {
       "iso3": "GBR",
@@ -1248,7 +1419,11 @@
       "subregion": "Western Asia",
       "lat": 42,
       "lng": 43.5,
-      "aliases": ["GEO", "Georgia", "Sakartvelo"]
+      "aliases": [
+        "GEO",
+        "Georgia",
+        "Sakartvelo"
+      ]
     },
     {
       "iso3": "GGY",
@@ -1260,7 +1435,12 @@
       "subregion": "Northern Europe",
       "lat": 49.46666666,
       "lng": -2.58333333,
-      "aliases": ["Bailiwick of Guernsey", "Bailliage de Guernesey", "GGY", "Guernsey"]
+      "aliases": [
+        "Bailiwick of Guernsey",
+        "Bailliage de Guernesey",
+        "GGY",
+        "Guernsey"
+      ]
     },
     {
       "iso3": "GHA",
@@ -1272,7 +1452,11 @@
       "subregion": "Western Africa",
       "lat": 8,
       "lng": -2,
-      "aliases": ["GHA", "Ghana", "Republic of Ghana"]
+      "aliases": [
+        "GHA",
+        "Ghana",
+        "Republic of Ghana"
+      ]
     },
     {
       "iso3": "GIB",
@@ -1284,7 +1468,10 @@
       "subregion": "Southern Europe",
       "lat": 36.13333333,
       "lng": -5.35,
-      "aliases": ["GIB", "Gibraltar"]
+      "aliases": [
+        "GIB",
+        "Gibraltar"
+      ]
     },
     {
       "iso3": "GIN",
@@ -1296,7 +1483,12 @@
       "subregion": "Western Africa",
       "lat": 11,
       "lng": -10,
-      "aliases": ["GIN", "Guinea", "Republic of Guinea", "République de Guinée"]
+      "aliases": [
+        "GIN",
+        "Guinea",
+        "Republic of Guinea",
+        "République de Guinée"
+      ]
     },
     {
       "iso3": "GLP",
@@ -1308,7 +1500,11 @@
       "subregion": "Caribbean",
       "lat": 16.25,
       "lng": -61.583333,
-      "aliases": ["GLP", "Guadeloupe", "Gwadloup"]
+      "aliases": [
+        "GLP",
+        "Guadeloupe",
+        "Gwadloup"
+      ]
     },
     {
       "iso3": "GMB",
@@ -1374,7 +1570,13 @@
       "subregion": "Southern Europe",
       "lat": 39,
       "lng": 22,
-      "aliases": ["Elláda", "GRC", "Greece", "Hellenic Republic", "Ελληνική Δημοκρατία"]
+      "aliases": [
+        "Elláda",
+        "GRC",
+        "Greece",
+        "Hellenic Republic",
+        "Ελληνική Δημοκρατία"
+      ]
     },
     {
       "iso3": "GRD",
@@ -1386,7 +1588,10 @@
       "subregion": "Caribbean",
       "lat": 12.11666666,
       "lng": -61.66666666,
-      "aliases": ["GRD", "Grenada"]
+      "aliases": [
+        "GRD",
+        "Grenada"
+      ]
     },
     {
       "iso3": "GRL",
@@ -1398,7 +1603,11 @@
       "subregion": "North America",
       "lat": 72,
       "lng": -40,
-      "aliases": ["GRL", "Greenland", "Grønland"]
+      "aliases": [
+        "GRL",
+        "Greenland",
+        "Grønland"
+      ]
     },
     {
       "iso3": "GTM",
@@ -1410,7 +1619,11 @@
       "subregion": "Central America",
       "lat": 15.5,
       "lng": -90.25,
-      "aliases": ["GTM", "Guatemala", "Republic of Guatemala"]
+      "aliases": [
+        "GTM",
+        "Guatemala",
+        "Republic of Guatemala"
+      ]
     },
     {
       "iso3": "GUF",
@@ -1422,7 +1635,12 @@
       "subregion": "South America",
       "lat": 4,
       "lng": -53,
-      "aliases": ["French Guiana", "GUF", "Guiana", "Guyane"]
+      "aliases": [
+        "French Guiana",
+        "GUF",
+        "Guiana",
+        "Guyane"
+      ]
     },
     {
       "iso3": "GUM",
@@ -1434,7 +1652,11 @@
       "subregion": "Micronesia",
       "lat": 13.46666666,
       "lng": 144.78333333,
-      "aliases": ["GUM", "Guam", "Guåhån"]
+      "aliases": [
+        "GUM",
+        "Guam",
+        "Guåhån"
+      ]
     },
     {
       "iso3": "GUY",
@@ -1446,7 +1668,11 @@
       "subregion": "South America",
       "lat": 5,
       "lng": -59,
-      "aliases": ["Co-operative Republic of Guyana", "GUY", "Guyana"]
+      "aliases": [
+        "Co-operative Republic of Guyana",
+        "GUY",
+        "Guyana"
+      ]
     },
     {
       "iso3": "HKG",
@@ -1477,7 +1703,10 @@
       "subregion": null,
       "lat": -53.1,
       "lng": 72.51666666,
-      "aliases": ["HMD", "Heard Island and McDonald Islands"]
+      "aliases": [
+        "HMD",
+        "Heard Island and McDonald Islands"
+      ]
     },
     {
       "iso3": "HND",
@@ -1489,7 +1718,12 @@
       "subregion": "Central America",
       "lat": 15,
       "lng": -86.5,
-      "aliases": ["HND", "Honduras", "Republic of Honduras", "República de Honduras"]
+      "aliases": [
+        "HND",
+        "Honduras",
+        "Republic of Honduras",
+        "República de Honduras"
+      ]
     },
     {
       "iso3": "HRV",
@@ -1537,7 +1771,10 @@
       "subregion": "Central Europe",
       "lat": 47,
       "lng": 20,
-      "aliases": ["HUN", "Hungary"]
+      "aliases": [
+        "HUN",
+        "Hungary"
+      ]
     },
     {
       "iso3": "IDN",
@@ -1549,7 +1786,12 @@
       "subregion": "South-Eastern Asia",
       "lat": -5,
       "lng": 120,
-      "aliases": ["IDN", "Indonesia", "Republic of Indonesia", "Republik Indonesia"]
+      "aliases": [
+        "IDN",
+        "Indonesia",
+        "Republic of Indonesia",
+        "Republik Indonesia"
+      ]
     },
     {
       "iso3": "IMN",
@@ -1561,7 +1803,13 @@
       "subregion": "Northern Europe",
       "lat": 54.25,
       "lng": -4.5,
-      "aliases": ["Ellan Vannin", "IMN", "Isle of Man", "Mann", "Mannin"]
+      "aliases": [
+        "Ellan Vannin",
+        "IMN",
+        "Isle of Man",
+        "Mann",
+        "Mannin"
+      ]
     },
     {
       "iso3": "IND",
@@ -1592,7 +1840,10 @@
       "subregion": "Eastern Africa",
       "lat": -6,
       "lng": 71.5,
-      "aliases": ["British Indian Ocean Territory", "IOT"]
+      "aliases": [
+        "British Indian Ocean Territory",
+        "IOT"
+      ]
     },
     {
       "iso3": "IRL",
@@ -1642,7 +1893,12 @@
       "subregion": "Western Asia",
       "lat": 33,
       "lng": 44,
-      "aliases": ["IRQ", "Iraq", "Jumhūriyyat al-‘Irāq", "Republic of Iraq"]
+      "aliases": [
+        "IRQ",
+        "Iraq",
+        "Jumhūriyyat al-‘Irāq",
+        "Republic of Iraq"
+      ]
     },
     {
       "iso3": "ISL",
@@ -1654,7 +1910,13 @@
       "subregion": "Northern Europe",
       "lat": 65,
       "lng": -18,
-      "aliases": ["ISL", "Iceland", "Island", "Lýðveldið Ísland", "Republic of Iceland"]
+      "aliases": [
+        "ISL",
+        "Iceland",
+        "Island",
+        "Lýðveldið Ísland",
+        "Republic of Iceland"
+      ]
     },
     {
       "iso3": "ISR",
@@ -1666,7 +1928,12 @@
       "subregion": "Western Asia",
       "lat": 31.47,
       "lng": 35.13,
-      "aliases": ["ISR", "Israel", "Medīnat Yisrā'el", "State of Israel"]
+      "aliases": [
+        "ISR",
+        "Israel",
+        "Medīnat Yisrā'el",
+        "State of Israel"
+      ]
     },
     {
       "iso3": "ITA",
@@ -1678,7 +1945,12 @@
       "subregion": "Southern Europe",
       "lat": 42.83333333,
       "lng": 12.83333333,
-      "aliases": ["ITA", "Italian Republic", "Italy", "Repubblica italiana"]
+      "aliases": [
+        "ITA",
+        "Italian Republic",
+        "Italy",
+        "Repubblica italiana"
+      ]
     },
     {
       "iso3": "JAM",
@@ -1690,7 +1962,10 @@
       "subregion": "Caribbean",
       "lat": 18.25,
       "lng": -77.5,
-      "aliases": ["JAM", "Jamaica"]
+      "aliases": [
+        "JAM",
+        "Jamaica"
+      ]
     },
     {
       "iso3": "JEY",
@@ -1737,7 +2012,12 @@
       "subregion": "Eastern Asia",
       "lat": 36,
       "lng": 138,
-      "aliases": ["JPN", "Japan", "Nihon", "Nippon"]
+      "aliases": [
+        "JPN",
+        "Japan",
+        "Nihon",
+        "Nippon"
+      ]
     },
     {
       "iso3": "KAZ",
@@ -1771,7 +2051,12 @@
       "subregion": "Eastern Africa",
       "lat": 1,
       "lng": 38,
-      "aliases": ["Jamhuri ya Kenya", "KEN", "Kenya", "Republic of Kenya"]
+      "aliases": [
+        "Jamhuri ya Kenya",
+        "KEN",
+        "Kenya",
+        "Republic of Kenya"
+      ]
     },
     {
       "iso3": "KGZ",
@@ -1802,7 +2087,11 @@
       "subregion": "South-Eastern Asia",
       "lat": 13,
       "lng": 105,
-      "aliases": ["Cambodia", "KHM", "Kingdom of Cambodia"]
+      "aliases": [
+        "Cambodia",
+        "KHM",
+        "Kingdom of Cambodia"
+      ]
     },
     {
       "iso3": "KIR",
@@ -1869,7 +2158,12 @@
       "subregion": "Western Asia",
       "lat": 29.5,
       "lng": 45.75,
-      "aliases": ["Dawlat al-Kuwait", "KWT", "Kuwait", "State of Kuwait"]
+      "aliases": [
+        "Dawlat al-Kuwait",
+        "KWT",
+        "Kuwait",
+        "State of Kuwait"
+      ]
     },
     {
       "iso3": "LAO",
@@ -1900,7 +2194,12 @@
       "subregion": "Western Asia",
       "lat": 33.83333333,
       "lng": 35.83333333,
-      "aliases": ["Al-Jumhūrīyah Al-Libnānīyah", "LBN", "Lebanese Republic", "Lebanon"]
+      "aliases": [
+        "Al-Jumhūrīyah Al-Libnānīyah",
+        "LBN",
+        "Lebanese Republic",
+        "Lebanon"
+      ]
     },
     {
       "iso3": "LBR",
@@ -1912,7 +2211,11 @@
       "subregion": "Western Africa",
       "lat": 6.5,
       "lng": -9.5,
-      "aliases": ["LBR", "Liberia", "Republic of Liberia"]
+      "aliases": [
+        "LBR",
+        "Liberia",
+        "Republic of Liberia"
+      ]
     },
     {
       "iso3": "LBY",
@@ -1924,7 +2227,12 @@
       "subregion": "Northern Africa",
       "lat": 25,
       "lng": 17,
-      "aliases": ["Dawlat Libya", "LBY", "Libya", "State of Libya"]
+      "aliases": [
+        "Dawlat Libya",
+        "LBY",
+        "Libya",
+        "State of Libya"
+      ]
     },
     {
       "iso3": "LCA",
@@ -1936,7 +2244,11 @@
       "subregion": "Caribbean",
       "lat": 13.88333333,
       "lng": -60.96666666,
-      "aliases": ["LCA", "Saint Lucia", "St. Lucia"]
+      "aliases": [
+        "LCA",
+        "Saint Lucia",
+        "St. Lucia"
+      ]
     },
     {
       "iso3": "LIE",
@@ -1982,7 +2294,12 @@
       "subregion": "Southern Africa",
       "lat": -29.5,
       "lng": 28.5,
-      "aliases": ["Kingdom of Lesotho", "LSO", "Lesotho", "Muso oa Lesotho"]
+      "aliases": [
+        "Kingdom of Lesotho",
+        "LSO",
+        "Lesotho",
+        "Muso oa Lesotho"
+      ]
     },
     {
       "iso3": "LTU",
@@ -1994,7 +2311,12 @@
       "subregion": "Northern Europe",
       "lat": 56,
       "lng": 24,
-      "aliases": ["LTU", "Lietuvos Respublika", "Lithuania", "Republic of Lithuania"]
+      "aliases": [
+        "LTU",
+        "Lietuvos Respublika",
+        "Lithuania",
+        "Republic of Lithuania"
+      ]
     },
     {
       "iso3": "LUX",
@@ -2025,7 +2347,12 @@
       "subregion": "Northern Europe",
       "lat": 57,
       "lng": 25,
-      "aliases": ["LVA", "Latvia", "Latvijas Republika", "Republic of Latvia"]
+      "aliases": [
+        "LVA",
+        "Latvia",
+        "Latvijas Republika",
+        "Republic of Latvia"
+      ]
     },
     {
       "iso3": "MAC",
@@ -2075,7 +2402,12 @@
       "subregion": "Northern Africa",
       "lat": 32,
       "lng": -5,
-      "aliases": ["Al-Mamlakah al-Maġribiyah", "Kingdom of Morocco", "MAR", "Morocco"]
+      "aliases": [
+        "Al-Mamlakah al-Maġribiyah",
+        "Kingdom of Morocco",
+        "MAR",
+        "Morocco"
+      ]
     },
     {
       "iso3": "MCO",
@@ -2087,7 +2419,12 @@
       "subregion": "Western Europe",
       "lat": 43.73333333,
       "lng": 7.4,
-      "aliases": ["MCO", "Monaco", "Principality of Monaco", "Principauté de Monaco"]
+      "aliases": [
+        "MCO",
+        "Monaco",
+        "Principality of Monaco",
+        "Principauté de Monaco"
+      ]
     },
     {
       "iso3": "MDA",
@@ -2209,7 +2546,12 @@
       "subregion": "Western Africa",
       "lat": 17,
       "lng": -4,
-      "aliases": ["MLI", "Mali", "Republic of Mali", "République du Mali"]
+      "aliases": [
+        "MLI",
+        "Mali",
+        "Republic of Mali",
+        "République du Mali"
+      ]
     },
     {
       "iso3": "MLT",
@@ -2221,7 +2563,12 @@
       "subregion": "Southern Europe",
       "lat": 35.83333333,
       "lng": 14.58333333,
-      "aliases": ["MLT", "Malta", "Repubblika ta' Malta", "Republic of Malta"]
+      "aliases": [
+        "MLT",
+        "Malta",
+        "Repubblika ta' Malta",
+        "Republic of Malta"
+      ]
     },
     {
       "iso3": "MMR",
@@ -2251,7 +2598,11 @@
       "subregion": "Southeast Europe",
       "lat": 42.5,
       "lng": 19.3,
-      "aliases": ["Crna Gora", "MNE", "Montenegro"]
+      "aliases": [
+        "Crna Gora",
+        "MNE",
+        "Montenegro"
+      ]
     },
     {
       "iso3": "MNG",
@@ -2263,7 +2614,10 @@
       "subregion": "Eastern Asia",
       "lat": 46,
       "lng": 105,
-      "aliases": ["MNG", "Mongolia"]
+      "aliases": [
+        "MNG",
+        "Mongolia"
+      ]
     },
     {
       "iso3": "MNP",
@@ -2326,7 +2680,10 @@
       "subregion": "Caribbean",
       "lat": 16.75,
       "lng": -62.2,
-      "aliases": ["MSR", "Montserrat"]
+      "aliases": [
+        "MSR",
+        "Montserrat"
+      ]
     },
     {
       "iso3": "MTQ",
@@ -2338,7 +2695,10 @@
       "subregion": "Caribbean",
       "lat": 14.666667,
       "lng": -61,
-      "aliases": ["MTQ", "Martinique"]
+      "aliases": [
+        "MTQ",
+        "Martinique"
+      ]
     },
     {
       "iso3": "MUS",
@@ -2350,7 +2710,12 @@
       "subregion": "Eastern Africa",
       "lat": -20.28333333,
       "lng": 57.55,
-      "aliases": ["MUS", "Mauritius", "Republic of Mauritius", "République de Maurice"]
+      "aliases": [
+        "MUS",
+        "Mauritius",
+        "Republic of Mauritius",
+        "République de Maurice"
+      ]
     },
     {
       "iso3": "MWI",
@@ -2362,7 +2727,11 @@
       "subregion": "Eastern Africa",
       "lat": -13.5,
       "lng": 34,
-      "aliases": ["MWI", "Malawi", "Republic of Malawi"]
+      "aliases": [
+        "MWI",
+        "Malawi",
+        "Republic of Malawi"
+      ]
     },
     {
       "iso3": "MYS",
@@ -2374,7 +2743,10 @@
       "subregion": "South-Eastern Asia",
       "lat": 2.5,
       "lng": 112.5,
-      "aliases": ["MYS", "Malaysia"]
+      "aliases": [
+        "MYS",
+        "Malaysia"
+      ]
     },
     {
       "iso3": "MYT",
@@ -2386,7 +2758,12 @@
       "subregion": "Eastern Africa",
       "lat": -12.83333333,
       "lng": 45.16666666,
-      "aliases": ["Department of Mayotte", "Département de Mayotte", "MYT", "Mayotte"]
+      "aliases": [
+        "Department of Mayotte",
+        "Département de Mayotte",
+        "MYT",
+        "Mayotte"
+      ]
     },
     {
       "iso3": "NAM",
@@ -2398,7 +2775,12 @@
       "subregion": "Southern Africa",
       "lat": -22,
       "lng": 17,
-      "aliases": ["NAM", "Namibia", "Namibië", "Republic of Namibia"]
+      "aliases": [
+        "NAM",
+        "Namibia",
+        "Namibië",
+        "Republic of Namibia"
+      ]
     },
     {
       "iso3": "NCL",
@@ -2410,7 +2792,10 @@
       "subregion": "Melanesia",
       "lat": -21.5,
       "lng": 165.5,
-      "aliases": ["NCL", "New Caledonia"]
+      "aliases": [
+        "NCL",
+        "New Caledonia"
+      ]
     },
     {
       "iso3": "NER",
@@ -2422,7 +2807,12 @@
       "subregion": "Western Africa",
       "lat": 16,
       "lng": 8,
-      "aliases": ["NER", "Niger", "Nijar", "Republic of Niger"]
+      "aliases": [
+        "NER",
+        "Niger",
+        "Nijar",
+        "Republic of Niger"
+      ]
     },
     {
       "iso3": "NFK",
@@ -2469,7 +2859,12 @@
       "subregion": "Central America",
       "lat": 13,
       "lng": -85,
-      "aliases": ["NIC", "Nicaragua", "Republic of Nicaragua", "República de Nicaragua"]
+      "aliases": [
+        "NIC",
+        "Nicaragua",
+        "Republic of Nicaragua",
+        "República de Nicaragua"
+      ]
     },
     {
       "iso3": "NIU",
@@ -2481,7 +2876,10 @@
       "subregion": "Polynesia",
       "lat": -19.03333333,
       "lng": -169.86666666,
-      "aliases": ["NIU", "Niue"]
+      "aliases": [
+        "NIU",
+        "Niue"
+      ]
     },
     {
       "iso3": "NLD",
@@ -2568,7 +2966,11 @@
       "subregion": "Australia and New Zealand",
       "lat": -41,
       "lng": 174,
-      "aliases": ["Aotearoa", "NZL", "New Zealand"]
+      "aliases": [
+        "Aotearoa",
+        "NZL",
+        "New Zealand"
+      ]
     },
     {
       "iso3": "OMN",
@@ -2580,7 +2982,12 @@
       "subregion": "Western Asia",
       "lat": 21,
       "lng": 57,
-      "aliases": ["OMN", "Oman", "Salṭanat ʻUmān", "Sultanate of Oman"]
+      "aliases": [
+        "OMN",
+        "Oman",
+        "Salṭanat ʻUmān",
+        "Sultanate of Oman"
+      ]
     },
     {
       "iso3": "PAK",
@@ -2610,7 +3017,12 @@
       "subregion": "Central America",
       "lat": 9,
       "lng": -80,
-      "aliases": ["PAN", "Panama", "Republic of Panama", "República de Panamá"]
+      "aliases": [
+        "PAN",
+        "Panama",
+        "Republic of Panama",
+        "República de Panamá"
+      ]
     },
     {
       "iso3": "PCN",
@@ -2640,7 +3052,12 @@
       "subregion": "South America",
       "lat": -10,
       "lng": -76,
-      "aliases": ["PER", "Peru", "Republic of Peru", "República del Perú"]
+      "aliases": [
+        "PER",
+        "Peru",
+        "Republic of Peru",
+        "República del Perú"
+      ]
     },
     {
       "iso3": "PHL",
@@ -2669,7 +3086,12 @@
       "subregion": "Micronesia",
       "lat": 7.5,
       "lng": 134.5,
-      "aliases": ["Beluu er a Belau", "PLW", "Palau", "Republic of Palau"]
+      "aliases": [
+        "Beluu er a Belau",
+        "PLW",
+        "Palau",
+        "Republic of Palau"
+      ]
     },
     {
       "iso3": "PNG",
@@ -2698,7 +3120,12 @@
       "subregion": "Central Europe",
       "lat": 52,
       "lng": 20,
-      "aliases": ["POL", "Poland", "Republic of Poland", "Rzeczpospolita Polska"]
+      "aliases": [
+        "POL",
+        "Poland",
+        "Republic of Poland",
+        "Rzeczpospolita Polska"
+      ]
     },
     {
       "iso3": "PRI",
@@ -2805,7 +3232,12 @@
       "subregion": "Polynesia",
       "lat": -15,
       "lng": -140,
-      "aliases": ["French Polynesia", "PYF", "Polynésie française", "Pōrīnetia Farāni"]
+      "aliases": [
+        "French Polynesia",
+        "PYF",
+        "Polynésie française",
+        "Pōrīnetia Farāni"
+      ]
     },
     {
       "iso3": "QAT",
@@ -2817,7 +3249,12 @@
       "subregion": "Western Asia",
       "lat": 25.5,
       "lng": 51.25,
-      "aliases": ["Dawlat Qaṭar", "QAT", "Qatar", "State of Qatar"]
+      "aliases": [
+        "Dawlat Qaṭar",
+        "QAT",
+        "Qatar",
+        "State of Qatar"
+      ]
     },
     {
       "iso3": "REU",
@@ -2829,7 +3266,12 @@
       "subregion": "Eastern Africa",
       "lat": -21.15,
       "lng": 55.5,
-      "aliases": ["REU", "Reunion", "Réunion", "Réunion Island"]
+      "aliases": [
+        "REU",
+        "Reunion",
+        "Réunion",
+        "Réunion Island"
+      ]
     },
     {
       "iso3": "ROU",
@@ -2841,7 +3283,13 @@
       "subregion": "Southeast Europe",
       "lat": 46,
       "lng": 25,
-      "aliases": ["ROU", "Romania", "România", "Roumania", "Rumania"]
+      "aliases": [
+        "ROU",
+        "Romania",
+        "România",
+        "Roumania",
+        "Rumania"
+      ]
     },
     {
       "iso3": "RUS",
@@ -2853,7 +3301,12 @@
       "subregion": "Eastern Europe",
       "lat": 60,
       "lng": 100,
-      "aliases": ["RUS", "Russia", "Russian Federation", "Российская Федерация"]
+      "aliases": [
+        "RUS",
+        "Russia",
+        "Russian Federation",
+        "Российская Федерация"
+      ]
     },
     {
       "iso3": "RWA",
@@ -2901,7 +3354,12 @@
       "subregion": "Northern Africa",
       "lat": 15,
       "lng": 30,
-      "aliases": ["Jumhūrīyat as-Sūdān", "Republic of the Sudan", "SDN", "Sudan"]
+      "aliases": [
+        "Jumhūrīyat as-Sūdān",
+        "Republic of the Sudan",
+        "SDN",
+        "Sudan"
+      ]
     },
     {
       "iso3": "SEN",
@@ -2913,7 +3371,12 @@
       "subregion": "Western Africa",
       "lat": 14,
       "lng": -14,
-      "aliases": ["Republic of Senegal", "République du Sénégal", "SEN", "Senegal"]
+      "aliases": [
+        "Republic of Senegal",
+        "République du Sénégal",
+        "SEN",
+        "Senegal"
+      ]
     },
     {
       "iso3": "SGP",
@@ -2994,7 +3457,10 @@
       "subregion": "Melanesia",
       "lat": -8,
       "lng": 159,
-      "aliases": ["SLB", "Solomon Islands"]
+      "aliases": [
+        "SLB",
+        "Solomon Islands"
+      ]
     },
     {
       "iso3": "SLE",
@@ -3006,7 +3472,11 @@
       "subregion": "Western Africa",
       "lat": 8.5,
       "lng": -11.5,
-      "aliases": ["Republic of Sierra Leone", "SLE", "Sierra Leone"]
+      "aliases": [
+        "Republic of Sierra Leone",
+        "SLE",
+        "Sierra Leone"
+      ]
     },
     {
       "iso3": "SLV",
@@ -3108,7 +3578,11 @@
       "subregion": "Middle Africa",
       "lat": 7,
       "lng": 30,
-      "aliases": ["Republic of South Sudan", "SSD", "South Sudan"]
+      "aliases": [
+        "Republic of South Sudan",
+        "SSD",
+        "South Sudan"
+      ]
     },
     {
       "iso3": "STP",
@@ -3157,7 +3631,12 @@
       "subregion": "Central Europe",
       "lat": 48.66666666,
       "lng": 19.5,
-      "aliases": ["SVK", "Slovak Republic", "Slovakia", "Slovenská republika"]
+      "aliases": [
+        "SVK",
+        "Slovak Republic",
+        "Slovakia",
+        "Slovenská republika"
+      ]
     },
     {
       "iso3": "SVN",
@@ -3169,7 +3648,12 @@
       "subregion": "Central Europe",
       "lat": 46.11666666,
       "lng": 14.81666666,
-      "aliases": ["Republic of Slovenia", "Republika Slovenija", "SVN", "Slovenia"]
+      "aliases": [
+        "Republic of Slovenia",
+        "Republika Slovenija",
+        "SVN",
+        "Slovenia"
+      ]
     },
     {
       "iso3": "SWE",
@@ -3181,7 +3665,12 @@
       "subregion": "Northern Europe",
       "lat": 62,
       "lng": 15,
-      "aliases": ["Kingdom of Sweden", "Konungariket Sverige", "SWE", "Sweden"]
+      "aliases": [
+        "Kingdom of Sweden",
+        "Konungariket Sverige",
+        "SWE",
+        "Sweden"
+      ]
     },
     {
       "iso3": "SWZ",
@@ -3214,7 +3703,11 @@
       "subregion": "Caribbean",
       "lat": 18.033333,
       "lng": -63.05,
-      "aliases": ["SXM", "Sint Maarten", "Sint Maarten (Dutch part)"]
+      "aliases": [
+        "SXM",
+        "Sint Maarten",
+        "Sint Maarten (Dutch part)"
+      ]
     },
     {
       "iso3": "SYC",
@@ -3261,7 +3754,10 @@
       "subregion": "Caribbean",
       "lat": 21.75,
       "lng": -71.58333333,
-      "aliases": ["TCA", "Turks and Caicos Islands"]
+      "aliases": [
+        "TCA",
+        "Turks and Caicos Islands"
+      ]
     },
     {
       "iso3": "TCD",
@@ -3273,7 +3769,13 @@
       "subregion": "Middle Africa",
       "lat": 15,
       "lng": 19,
-      "aliases": ["Chad", "Republic of Chad", "République du Tchad", "TCD", "Tchad"]
+      "aliases": [
+        "Chad",
+        "Republic of Chad",
+        "République du Tchad",
+        "TCD",
+        "Tchad"
+      ]
     },
     {
       "iso3": "TGO",
@@ -3342,7 +3844,10 @@
       "subregion": "Polynesia",
       "lat": -9,
       "lng": -172,
-      "aliases": ["TKL", "Tokelau"]
+      "aliases": [
+        "TKL",
+        "Tokelau"
+      ]
     },
     {
       "iso3": "TKM",
@@ -3354,7 +3859,10 @@
       "subregion": "Central Asia",
       "lat": 40,
       "lng": 60,
-      "aliases": ["TKM", "Turkmenistan"]
+      "aliases": [
+        "TKM",
+        "Turkmenistan"
+      ]
     },
     {
       "iso3": "TLS",
@@ -3388,7 +3896,11 @@
       "subregion": "Polynesia",
       "lat": -20,
       "lng": -175,
-      "aliases": ["Kingdom of Tonga", "TON", "Tonga"]
+      "aliases": [
+        "Kingdom of Tonga",
+        "TON",
+        "Tonga"
+      ]
     },
     {
       "iso3": "TTO",
@@ -3400,7 +3912,11 @@
       "subregion": "Caribbean",
       "lat": 11,
       "lng": -61,
-      "aliases": ["Republic of Trinidad and Tobago", "TTO", "Trinidad and Tobago"]
+      "aliases": [
+        "Republic of Trinidad and Tobago",
+        "TTO",
+        "Trinidad and Tobago"
+      ]
     },
     {
       "iso3": "TUN",
@@ -3450,7 +3966,10 @@
       "subregion": "Polynesia",
       "lat": -8,
       "lng": 178,
-      "aliases": ["TUV", "Tuvalu"]
+      "aliases": [
+        "TUV",
+        "Tuvalu"
+      ]
     },
     {
       "iso3": "TWN",
@@ -3502,7 +4021,12 @@
       "subregion": "Eastern Africa",
       "lat": 1,
       "lng": 32,
-      "aliases": ["Jamhuri ya Uganda", "Republic of Uganda", "UGA", "Uganda"]
+      "aliases": [
+        "Jamhuri ya Uganda",
+        "Republic of Uganda",
+        "UGA",
+        "Uganda"
+      ]
     },
     {
       "iso3": "UKR",
@@ -3514,7 +4038,11 @@
       "subregion": "Eastern Europe",
       "lat": 49,
       "lng": 32,
-      "aliases": ["UKR", "Ukraine", "Ukrayina"]
+      "aliases": [
+        "UKR",
+        "Ukraine",
+        "Ukrayina"
+      ]
     },
     {
       "iso3": "UMI",
@@ -3526,7 +4054,10 @@
       "subregion": "North America",
       "lat": 19.3,
       "lng": 166.633333,
-      "aliases": ["UMI", "United States Minor Outlying Islands"]
+      "aliases": [
+        "UMI",
+        "United States Minor Outlying Islands"
+      ]
     },
     {
       "iso3": "UNK",
@@ -3538,7 +4069,12 @@
       "subregion": "Southeast Europe",
       "lat": 42.666667,
       "lng": 21.166667,
-      "aliases": ["Kosovo", "Republic of Kosovo", "UNK", "Република Косово"]
+      "aliases": [
+        "Kosovo",
+        "Republic of Kosovo",
+        "UNK",
+        "Република Косово"
+      ]
     },
     {
       "iso3": "URY",
@@ -3567,7 +4103,11 @@
       "subregion": "North America",
       "lat": 38,
       "lng": -97,
-      "aliases": ["USA", "United States", "United States of America"]
+      "aliases": [
+        "USA",
+        "United States",
+        "United States of America"
+      ]
     },
     {
       "iso3": "UZB",
@@ -3795,7 +4335,11 @@
       "subregion": "Eastern Africa",
       "lat": -15,
       "lng": 30,
-      "aliases": ["Republic of Zambia", "ZMB", "Zambia"]
+      "aliases": [
+        "Republic of Zambia",
+        "ZMB",
+        "Zambia"
+      ]
     },
     {
       "iso3": "ZWE",
@@ -3807,7 +4351,11 @@
       "subregion": "Eastern Africa",
       "lat": -20,
       "lng": 30,
-      "aliases": ["Republic of Zimbabwe", "ZWE", "Zimbabwe"]
+      "aliases": [
+        "Republic of Zimbabwe",
+        "ZWE",
+        "Zimbabwe"
+      ]
     }
   ],
   "nonCountries": [

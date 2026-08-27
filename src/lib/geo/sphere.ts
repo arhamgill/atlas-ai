@@ -43,13 +43,3 @@ export function vector3ToLatLng(x: number, y: number, z: number): LatLng {
   while (lng >= 180) lng -= 360;
   return { lat, lng };
 }
-
-/** Shortest angular distance in degrees — used to ease camera flights. */
-export function angularDistance(a: LatLng, b: LatLng): number {
-  const dLat = (b.lat - a.lat) * DEG;
-  const dLng = (b.lng - a.lng) * DEG;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(a.lat * DEG) * Math.cos(b.lat * DEG) * Math.sin(dLng / 2) ** 2;
-  return (2 * Math.asin(Math.min(1, Math.sqrt(h)))) / DEG;
-}

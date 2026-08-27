@@ -1,6 +1,6 @@
 import { line as d3line, curveMonotoneX } from "d3-shape";
 import { scaleLinear, scalePoint } from "d3-scale";
-import { AREA_OPACITY, DOT_R, layerColor } from "./primitives";
+import { AREA_OPACITY, DOT_R, DOT_RING, layerColor } from "./primitives";
 
 /**
  * A trend shape, not a chart. No axes, no labels, no interaction — it sits
@@ -87,7 +87,7 @@ export function Sparkline({
         r={DOT_R - 1}
         fill={color}
         stroke="var(--bg-surface)"
-        strokeWidth={2}
+        strokeWidth={DOT_RING}
       />
     </svg>
   );

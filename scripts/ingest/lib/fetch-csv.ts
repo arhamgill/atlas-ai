@@ -80,8 +80,3 @@ export function parseCsv(text: string): Record<string, string>[] {
     bom: true,
   }) as Record<string, string>[];
 }
-
-export function getSnapshotDate(name: string): string | null {
-  const m = readManifest()[name];
-  return m ? m.retrievedAt : null;
-}

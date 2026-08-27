@@ -137,16 +137,16 @@ is off the critical render path. Layer payloads reach the client as
 
 ## Stack
 
-|               |                                                                          |
-| ------------- | ------------------------------------------------------------------------ |
-| **Framework** | Next.js 16 (App Router, RSC) · React 19 · TypeScript strict              |
-| **3D**        | three.js · React Three Fiber · drei · postprocessing · custom GLSL       |
-| **Styling**   | Tailwind CSS v4 · design tokens in one CSS file                          |
-| **Motion**    | Motion · custom camera damping · `prefers-reduced-motion` throughout     |
-| **Data viz**  | d3 modules (`scale`, `geo`, `shape`, `array`) — charts hand-built in SVG |
-| **State**     | Zustand · nuqs for URL-synced view state                                 |
-| **Backend**   | Neon serverless Postgres · Drizzle ORM · Zod                             |
-| **Testing**   | Vitest · Playwright                                                      |
+|               |                                                                                |
+| ------------- | ------------------------------------------------------------------------------ |
+| **Framework** | Next.js 16 (App Router, RSC) · React 19 · TypeScript strict                    |
+| **3D**        | three.js · React Three Fiber · drei · postprocessing · custom GLSL             |
+| **Styling**   | Tailwind CSS v4 · design tokens in one CSS file                                |
+| **Motion**    | Motion · custom camera damping · `prefers-reduced-motion` throughout           |
+| **Data viz**  | d3 modules (`scale`, `geo`, `shape`, `interpolate`) — charts hand-built in SVG |
+| **State**     | Zustand · nuqs for URL-synced view state                                       |
+| **Backend**   | Neon serverless Postgres · Drizzle ORM                                         |
+| **Testing**   | Vitest · Playwright                                                            |
 
 `noUncheckedIndexedAccess` is on. This project parses a lot of CSV, and it forces every
 indexed read to be checked rather than trusted.

@@ -8,6 +8,7 @@ import {
   AREA_OPACITY,
   DEFAULT_MARGIN,
   DOT_R,
+  DOT_RING,
   GRID_STROKE,
   STROKE,
   compact,
@@ -181,7 +182,7 @@ export function TimeSeries({
                 r={isActive ? DOT_R : DOT_R - 1.5}
                 fill={color}
                 stroke="var(--bg-surface)"
-                strokeWidth={2}
+                strokeWidth={DOT_RING}
                 opacity={isActive ? 1 : 0.85}
               />
             );

@@ -3,7 +3,17 @@ import { geoContains } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology } from "topojson-specification";
 import topoData from "world-atlas/countries-110m.json";
-import { getByNumeric } from "./crosswalk";
+import countryIndex from "../../../data/seed/country-index.json";
+
+/**
+ * ISO numeric -> [ISO3, display name].
+ *
+ * Deliberately not the full crosswalk. That file carries 1,088 name aliases for
+ * the ingest to resolve against, none of which the browser needs — importing it
+ * here shipped ~90 KB of dead weight in the globe bundle to answer a question
+ * this 6 KB map answers.
+ */
+const NUMERIC_TO_COUNTRY: Record<string, string[]> = countryIndex;
 
 export interface CountryFeature extends Feature<Geometry> {
   /** Null for the three disputed territories with no ISO numeric code
@@ -54,11 +64,11 @@ export function getCountryFeatures(): CountryFeature[] {
   cache = fc.features.map((f) => {
     const numeric =
       f.id === undefined || f.id === null ? null : String(f.id).padStart(3, "0");
-    const entry = numeric ? getByNumeric(numeric) : undefined;
+    const entry = numeric ? NUMERIC_TO_COUNTRY[numeric] : undefined;
     return {
       ...f,
-      iso3: entry?.iso3 ?? null,
-      name: entry?.name ?? String(f.properties?.["name"] ?? "Unknown"),
+      iso3: entry?.[0] ?? null,
+      name: entry?.[1] ?? String(f.properties?.["name"] ?? "Unknown"),
       bbox: computeBbox(f.geometry),
     } as CountryFeature;
   });

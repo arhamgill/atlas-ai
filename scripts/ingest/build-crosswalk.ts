@@ -181,7 +181,23 @@ function main() {
   const out = resolve(process.cwd(), "data/seed/country-crosswalk.json");
   writeFileSync(out, JSON.stringify(payload, null, 2) + "\n", "utf8");
 
+  /*
+   * A second, much smaller file for the browser.
+   *
+   * The full crosswalk is ~97 KB, almost all of it the 1,088 name aliases that
+   * only the ingest ever needs. The client needs exactly one thing: turning the
+   * TopoJSON's ISO numeric id into an ISO3 code and a display name. Shipping the
+   * whole crosswalk to do that put ~90 KB of dead weight in the globe bundle.
+   */
+  const compact: Record<string, [string, string]> = {};
+  for (const c of countries) {
+    if (c.isoNumeric) compact[c.isoNumeric] = [c.iso3, c.name];
+  }
+  const indexOut = resolve(process.cwd(), "data/seed/country-index.json");
+  writeFileSync(indexOut, JSON.stringify(compact) + "\n", "utf8");
+
   console.log(`crosswalk written        : ${out}`);
+  console.log(`client index written     : ${indexOut}`);
   console.log(`countries                : ${countries.length}`);
   console.log(`total aliases indexed    : ${exactOwners.size}`);
   console.log(

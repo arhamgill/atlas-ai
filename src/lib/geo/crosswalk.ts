@@ -28,7 +28,6 @@ const data = crosswalkData as unknown as Crosswalk;
 export const COUNTRIES: readonly CountryEntry[] = data.countries;
 
 const byIso3 = new Map(COUNTRIES.map((c) => [c.iso3, c]));
-const byIso2 = new Map(COUNTRIES.map((c) => [c.iso2, c]));
 const byNumeric = new Map(
   COUNTRIES.filter((c) => c.isoNumeric !== null).map((c) => [c.isoNumeric!, c]),
 );
@@ -52,10 +51,6 @@ const nonCountries = new Set(data.nonCountries.map(normalizeName));
 
 export function getByIso3(iso3: string): CountryEntry | undefined {
   return byIso3.get(iso3.toUpperCase());
-}
-
-export function getByIso2(iso2: string): CountryEntry | undefined {
-  return byIso2.get(iso2.toUpperCase());
 }
 
 /** The globe's TopoJSON keys on ISO 3166-1 numeric, so this bridge is required. */

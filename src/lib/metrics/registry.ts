@@ -125,10 +125,6 @@ export const METRIC_DEFS: MetricDef[] = [
 
 export const METRICS_BY_KEY = new Map(METRIC_DEFS.map((m) => [m.key, m]));
 
-export const LAYER_METRICS = METRIC_DEFS.filter(
-  (m): m is MetricDef & { layer: LayerKey } => m.layer !== null,
-);
-
 export function getMetric(key: string): MetricDef {
   const m = METRICS_BY_KEY.get(key);
   if (!m) throw new Error(`Unknown metric key "${key}". Add it to METRIC_DEFS.`);
