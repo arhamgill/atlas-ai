@@ -295,21 +295,21 @@ Sequential, perceptually uniform, ≥3:1 against `--bg-base` at the light end. V
 
 **This is the recruiter-facing product.**
 
-**Design system & shell** — tokens, type scale, noise, primitives, nav, footer with sources, page transitions
+**Design system & shell** — **DONE** — tokens, type scale, grain, site nav, command palette
 
 **Globe (`/`)** — full visual treatment (atmosphere, bloom, starfield) · layer switcher with interpolated transitions · hover tooltip · click-to-fly · legend with no-data entry · mobile tuning · static poster fallback
 
 **Country detail (`/countries/[iso3]`)** — hero with flag, region, headline metric · metric tiles with rank + delta + sparkline · adoption trajectory chart across the 3 periods · notable models table · companies HQ'd here · peer comparison (nearest 4 by rank) · every figure carrying a source tooltip
 
-**Countries index (`/countries`)** — sortable, filterable ranked table; the full keyboard-accessible mirror of the globe
+**Countries index (`/countries`)** — **DONE** — sortable, region-filterable, searchable, arrow-key navigable
 
-**Compare (`/compare`)** — 2–4 countries side by side · radar or parallel-coordinates across the 4 dimensions (**not** a composite score) · URL-encoded selection so comparisons are shareable
+**Compare (`/compare`)** — **DONE** — up to 4 countries, percentile within each dimension (**not** a composite score), URL-encoded
 
 **Trends (`/trends`)** — **Fastest Rising** as the hero: animated rank-flow (bump chart) over the three real adoption periods · biggest movers · regional aggregates (the adoption CSV ships OWID region, so this is free) · an investment scrubber across 2016–2025 · global context charts built from the three global-only OWID slugs (corporate investment by deal type; academia vs industry affiliation; US vs China vs Europe investment)
 
 **Companies (`/companies`, `/companies/[slug]`)** — ~25 curated profiles · country, founded, category, funding/valuation (cited), models shipped, timeline · every field showing its source · a visible, honest "curated dataset, last updated <date>" note
 
-**Cross-cutting** — command-palette search (⌘K) across countries/companies/models · loading skeletons · error boundaries · empty states
+**Cross-cutting** — **DONE** — ⌘K palette, loading skeletons, error boundary, not-found, empty states
 
 ---
 

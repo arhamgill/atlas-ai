@@ -19,9 +19,14 @@ updated as work lands.
 
 ## Current state
 
-**V0 complete.** Scaffold, full ingest pipeline, and the interactive globe are all
-done. Neon Postgres holds 3,419 metric rows / 3,419 rankings / 1,052 models across 194
-countries, all integrity checks passing. Next up: V1 country pages.
+**V0 complete. V1 mostly complete.** Neon Postgres holds 3,419 metric rows / 3,419
+rankings / 1,052 models across 194 countries, all integrity checks passing.
+
+Shipped: the globe, 194 static country pages, the ranked country index, compare, the
+case-study page, a command palette, sitemap/robots/OG images, error and loading states.
+
+Not shipped, deliberately: **Trends** (blocked on the imputation question, DECISIONS 005)
+and **Companies** (needs hand-curated data). Nothing is deployed yet.
 
 The globe (`src/components/globe/`) is a single textured sphere, not per-country meshes
 — see the Globe section below before changing it.
@@ -140,6 +145,25 @@ until you undo one:
 - Camera distance is derived from whichever FOV axis is tighter, so framing is correct
   from a 390px phone to an ultrawide.
 - View state lives in the URL (`?layer=&country=`), replace-not-push.
+
+## Charts
+
+`src/components/charts/`. Hand-built React + SVG on d3 scales — no chart library.
+
+- **Mark specs live in `primitives.ts`**, so a line in a sparkline is the same line as
+  one in a full time series. 2px round-capped strokes, area washes ~10% opacity,
+  hairline _solid_ gridlines (never dashed), dots at r>=4 with a 2px surface ring.
+- **One series per plot, so no legends.** The four layers have incompatible units; a
+  shared plot would need a second y-axis whose alignment is arbitrary and invents a
+  correlation. Four charts, one axis each.
+- **Never shade a bar by its own value.** Length already encodes magnitude; re-encoding
+  it as hue spends the only free channel restating that. One colour per column. The
+  globe is the exception — a choropleth has no length channel.
+- **Axis label precision follows the tick step.** A percent axis spanning 15.4–16.4
+  otherwise prints "16%" five times.
+- Skewed metrics (USD, counts) use log colour domains and square-root bar scales;
+  private AI investment spans six orders of magnitude.
+- **Comparing across layers means percentile**, never raw values and never a sum.
 
 ## Accessibility
 
