@@ -152,3 +152,49 @@
     animation-delay: 0s !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Globe time scrubber
+ *
+ * The range input keeps its native keyboard behaviour; only the track and
+ * thumb are restyled, and the hit area stays a full 20px tall.
+ * ------------------------------------------------------------------------- */
+.scrubber {
+  appearance: none;
+  background: transparent;
+  height: 20px;
+  cursor: pointer;
+}
+.scrubber::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+.scrubber::-moz-range-track {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+.scrubber::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+.scrubber::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+.scrubber:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}

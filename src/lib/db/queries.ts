@@ -43,11 +43,22 @@ export interface GlobeLayer {
   shortLabel: string;
   unit: string;
   precision: number;
+  /** The period `rows` describes: the latest, or a span for all-time totals. */
   period: string;
   periodCount: number;
   methodologyNote: string | null;
   sourceId: string;
   rows: LayerTuple[];
+  /**
+   * Every period this layer can be scrubbed through, oldest first, and the
+   * rows for each. A layer that is not scrubbable (one period, or an all-time
+   * total) reports a single entry, so callers need no special case.
+   *
+   * All periods ship with the page — 18 KB gzipped for the three time-varying
+   * layers, against an API route and a loading state per step of the scrubber.
+   */
+  periods: string[];
+  rowsByPeriod: LayerTuple[][];
 }
 
 /** Every globe layer collapsed to one value per country, ready for the client. */
@@ -99,6 +110,10 @@ export async function getGlobeLayers(): Promise<GlobeLayer[]> {
           .where(eq(metrics.metricKey, d.key))
           .groupBy(metrics.countryIso3);
 
+        const totalRows = rows.map(
+          (r) => [r.iso3.trim(), Number(r.value), Number(r.rank), null] as LayerTuple,
+        );
+
         return {
           key: d.key,
           layer: d.layer ?? "",
@@ -110,15 +125,17 @@ export async function getGlobeLayers(): Promise<GlobeLayer[]> {
           methodologyNote: d.methodologyNote,
           period: `${d.firstPeriod}–${d.latestPeriod}`,
           periodCount: Number(d.periodCount),
-          rows: rows.map(
-            (r) => [r.iso3.trim(), Number(r.value), Number(r.rank), null] as LayerTuple,
-          ),
+          rows: totalRows,
+          // An all-time total has no meaningful intermediate state to scrub to.
+          periods: [`${d.firstPeriod}–${d.latestPeriod}`],
+          rowsByPeriod: [totalRows],
         };
       }
 
       const rows = await db
         .select({
           iso3: metrics.countryIso3,
+          period: metrics.period,
           value: metrics.value,
           rank: rankings.rank,
           delta: rankings.delta,
@@ -132,7 +149,17 @@ export async function getGlobeLayers(): Promise<GlobeLayer[]> {
             eq(rankings.period, metrics.period),
           ),
         )
-        .where(and(eq(metrics.metricKey, d.key), eq(metrics.period, d.latestPeriod)));
+        .where(eq(metrics.metricKey, d.key))
+        .orderBy(metrics.period);
+
+      const byPeriod = new Map<string, LayerTuple[]>();
+      for (const r of rows) {
+        const list = byPeriod.get(r.period) ?? [];
+        list.push([r.iso3.trim(), r.value, r.rank ?? 0, r.delta]);
+        byPeriod.set(r.period, list);
+      }
+      const periods = [...byPeriod.keys()].sort();
+      const rowsByPeriod = periods.map((pd) => byPeriod.get(pd) ?? []);
 
       return {
         key: d.key,
@@ -145,9 +172,9 @@ export async function getGlobeLayers(): Promise<GlobeLayer[]> {
         methodologyNote: d.methodologyNote,
         period: d.latestPeriod,
         periodCount: Number(d.periodCount),
-        rows: rows.map(
-          (r) => [r.iso3.trim(), r.value, r.rank ?? 0, r.delta] as LayerTuple,
-        ),
+        rows: rowsByPeriod[periods.length - 1] ?? [],
+        periods,
+        rowsByPeriod,
       };
     }),
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { GlobeLayer } from "@/lib/db/queries";
 import { drawChoropleth, drawMask } from "@/lib/geo/render-maps";
@@ -13,6 +13,15 @@ import { useGlobeStore } from "@/lib/state/globe";
 /** 2048x1024 is ~5.7px per degree of longitude — comfortably sharper than the
  *  globe ever renders on screen, and 8 MB per layer instead of 33 MB at 4K. */
 const MAP_WIDTH = 2048;
+
+/**
+ * How many painted choropleths to keep.
+ *
+ * Each is 2048x1024 with mipmaps — roughly 11 MB of texture memory — so all 23
+ * layer/period combinations would be about 250 MB. Six covers a layer switch
+ * plus several scrubber positions, and anything evicted simply repaints.
+ */
+const TEXTURE_CACHE_LIMIT = 6;
 
 const vertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -101,6 +110,7 @@ export function Earth({ layers }: { layers: GlobeLayer[] }) {
   const gl = useThree((s) => s.gl);
 
   const layerIndex = useGlobeStore((s) => s.layerIndex);
+  const periodIndex = useGlobeStore((s) => s.periodIndex);
   const hovered = useGlobeStore((s) => s.hovered);
   const selected = useGlobeStore((s) => s.selected);
   const setHovered = useGlobeStore((s) => s.setHovered);
@@ -110,37 +120,75 @@ export function Earth({ layers }: { layers: GlobeLayer[] }) {
 
   const features = useMemo(() => getCountryFeatures(), []);
 
-  // One texture per layer, painted once. Switching layers is then a uniform
-  // crossfade rather than a repaint.
-  const textures = useMemo(() => {
-    const anisotropy = gl.capabilities.getMaxAnisotropy();
-    // A touch above the page background, so the globe reads as an object
-    // sitting in space rather than a hole cut out of the page.
-    const ocean = "#0b0f16";
-    const noData = readToken("--no-data", "#22262c");
-    const border = "rgba(255,255,255,0.16)";
-    const graticule = "rgba(255,255,255,0.045)";
+  // One colour scale per layer, built from every period rather than just the
+  // latest. Re-normalising per period would make 2016's leader as dark as
+  // 2025's and paint a decade of growth as no change at all.
+  const scales = useMemo(
+    () =>
+      layers.map((layer) =>
+        buildColorScale(
+          layer.layer,
+          layer.unit,
+          layer.rowsByPeriod.flatMap((rows) => rows.map((r) => r[1])),
+        ),
+      ),
+    [layers],
+  );
 
-    return layers.map((layer) => {
-      const valueByIso3 = new Map(layer.rows.map((r) => [r[0], r[1]]));
-      const scale = buildColorScale(
-        layer.layer,
-        layer.unit,
-        layer.rows.map((r) => r[1]),
-      );
+  /*
+   * Choropleths are painted on demand and cached, not built up front.
+   *
+   * Eagerly painting all 23 layer/period combinations would hold roughly
+   * 190 MB of texture memory for views most visitors never open, so a paint
+   * happens the first time a position is shown and the result is kept. Each
+   * one costs ~50 ms, which the existing crossfade covers.
+   */
+  const cache = useRef(new Map<string, THREE.CanvasTexture>());
+
+  const paint = useCallback(
+    (li: number, pi: number): THREE.CanvasTexture | null => {
+      const layer = layers[li];
+      const scale = scales[li];
+      if (!layer || !scale) return null;
+      const rows = layer.rowsByPeriod[pi] ?? layer.rows;
+      const key = `${li}:${pi}`;
+      const hit = cache.current.get(key);
+      if (hit) return hit;
+
       const canvas = drawChoropleth({
         features,
-        valueByIso3,
+        valueByIso3: new Map(rows.map((r) => [r[0], r[1]])),
         color: scale,
-        noDataColor: noData,
-        oceanColor: ocean,
-        borderColor: border,
-        graticuleColor: graticule,
+        noDataColor: readToken("--no-data", "#22262c"),
+        // A touch above the page background, so the globe reads as an object
+        // sitting in space rather than a hole cut out of the page.
+        oceanColor: "#0b0f16",
+        borderColor: "rgba(255,255,255,0.16)",
+        graticuleColor: "rgba(255,255,255,0.045)",
         width: MAP_WIDTH,
       });
-      return canvasTexture(canvas, anisotropy);
-    });
-  }, [layers, features, gl]);
+      const tex = canvasTexture(canvas, gl.capabilities.getMaxAnisotropy());
+      cache.current.set(key, tex);
+
+      // Evict oldest first, but never the two textures the shader is currently
+      // sampling — disposing one mid-crossfade would tear the globe.
+      const material = materialRef.current;
+      const inUse = new Set(
+        [material?.uniforms["uMapA"]?.value, material?.uniforms["uMapB"]?.value].filter(
+          Boolean,
+        ),
+      );
+      for (const [k, t] of cache.current) {
+        if (cache.current.size <= TEXTURE_CACHE_LIMIT) break;
+        if (t === tex || inUse.has(t)) continue;
+        t.dispose();
+        cache.current.delete(k);
+      }
+
+      return tex;
+    },
+    [layers, scales, features, gl],
+  );
 
   const maskTexture = useMemo(() => {
     const canvas = drawMask(features, null, null, 1024);
@@ -151,25 +199,29 @@ export function Earth({ layers }: { layers: GlobeLayer[] }) {
 
   const uniforms = useMemo(
     () => ({
-      uMapA: { value: textures[0] ?? null },
-      uMapB: { value: textures[0] ?? null },
+      // Filled by the crossfade effect below on mount; painting here would
+      // read the texture cache during render.
+      uMapA: { value: null as THREE.Texture | null },
+      uMapB: { value: null as THREE.Texture | null },
       uMask: { value: maskTexture },
       uMix: { value: 0 },
       uTime: { value: 0 },
       uAccent: { value: new THREE.Color(readToken("--accent", "#4cc9f0")) },
       uLightDir: { value: new THREE.Vector3(1, 0.35, 0.7).normalize() },
     }),
-    [textures, maskTexture],
+    [maskTexture],
   );
 
   useEffect(() => setReady(true), [setReady]);
 
   useEffect(() => {
+    const painted = cache.current;
     return () => {
-      for (const t of textures) t.dispose();
+      for (const t of painted.values()) t.dispose();
+      painted.clear();
       maskTexture.dispose();
     };
-  }, [textures, maskTexture]);
+  }, [maskTexture]);
 
   // Repaint the hover/selection mask only when it actually changes.
   useEffect(() => {
@@ -190,23 +242,37 @@ export function Earth({ layers }: { layers: GlobeLayer[] }) {
     };
   }, [features, hovered, selected, maskTexture]);
 
-  // Crossfade to the newly selected layer.
+  // Crossfade to the newly selected layer or period — the same path, so
+  // scrubbing a year feels exactly like switching a layer.
   const fadeTarget = useRef(layerIndex);
   useEffect(() => {
     const material = materialRef.current;
-    const next = textures[layerIndex];
-    if (!material || !next) return;
+    const layer = layers[layerIndex];
+    if (!material || !layer) return;
+    const pi = periodIndex < 0 ? layer.periods.length - 1 : periodIndex;
+    const next = paint(layerIndex, pi);
+    if (!next) return;
     const uMapA = material.uniforms["uMapA"];
     const uMapB = material.uniforms["uMapB"];
     const uMix = material.uniforms["uMix"];
     if (!uMapA || !uMapB || !uMix) return;
+
+    // Nothing on screen yet: show the first map outright rather than fading
+    // up from an empty slot.
+    if (!uMapA.value) {
+      uMapA.value = next;
+      uMapB.value = next;
+      uMix.value = 1;
+      fadeTarget.current = layerIndex;
+      return;
+    }
 
     // Freeze whatever is on screen into slot A, then fade slot B in.
     uMapA.value = uMix.value > 0.5 ? uMapB.value : uMapA.value;
     uMapB.value = next;
     uMix.value = 0;
     fadeTarget.current = layerIndex;
-  }, [layerIndex, textures]);
+  }, [layerIndex, periodIndex, layers, paint]);
 
   useFrame((_, delta) => {
     const material = materialRef.current;

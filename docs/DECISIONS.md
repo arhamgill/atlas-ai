@@ -126,3 +126,48 @@ run reproduces all 3,419 metric rows.
 
 `pnpm ingest:discover -- "<terms>"` queries OWID's search API and reports which charts
 are country-level, so a replacement slug is looked up rather than guessed.
+
+---
+
+## 007 — The globe's colour scale spans every period, not the one on screen
+
+**Date:** 2026-08-27 · **Status:** adopted
+
+**Context.** The globe can now be scrubbed through a layer's history: investment carries
+ten years (2016–2025), research nine (2016–2024). Adoption has three periods and
+development is an all-time total, so it does not scrub.
+
+**Decision.** `buildColorScale` receives the values from **all** of a layer's periods,
+not just the period being painted. The domain is fixed for the layer.
+
+**Consequences.** Scrubbing back to 2016 makes the map visibly dimmer, which is the
+finding — private AI investment grew roughly an order of magnitude over the decade, and
+the country count went from 69 to 92. Re-normalising per period would have painted 2016's
+leader exactly as dark as 2025's and rendered a decade of growth as no change at all.
+That would be fabricating a number in the only way a choropleth can.
+
+The corollary: only the **active** layer follows the scrubber. A year selected on
+investment may not exist on research, and showing an unrelated layer's 2016 figure beside
+a 2016 investment figure would imply the two were chosen together.
+
+---
+
+## 008 — Choropleths are painted on demand, with a bounded cache
+
+**Date:** 2026-08-27 · **Status:** adopted
+
+**Context.** Each choropleth is a 2048×1024 canvas uploaded as a mipmapped texture —
+roughly 11 MB of texture memory. Before scrubbing there were four, one per layer, painted
+eagerly at mount. With periods there are 23 combinations: about 250 MB, most of which a
+visitor never looks at.
+
+**Decision.** Textures are painted the first time a layer/period is shown and kept in an
+LRU cache capped at six (`TEXTURE_CACHE_LIMIT` in `Earth.tsx`). Eviction skips whatever
+the shader is currently sampling — disposing a texture mid-crossfade tears the globe.
+
+**Consequences.** Mount now paints one choropleth instead of four. A paint costs ~50 ms,
+which the existing `uMix` crossfade covers, and a revisited period is instant. Scrubbing
+across more than six positions repaints rather than growing without bound.
+
+Period changes deliberately reuse the layer-switch crossfade path, so scrubbing a year
+feels exactly like switching a layer rather than like a different mechanism.

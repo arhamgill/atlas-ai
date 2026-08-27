@@ -9,7 +9,7 @@ import { useGlobeStore } from "@/lib/state/globe";
 /**
  * Mirrors the globe's view into the URL, so any state is a shareable link:
  *
- *   /?layer=investment&country=BRA
+ *   /?layer=investment&period=2019&country=BRA
  *
  * History is replaced rather than pushed. Holding an arrow key walks the
  * ranking a country at a time, and pushing each step would bury the back
@@ -19,13 +19,15 @@ import { useGlobeStore } from "@/lib/state/globe";
  */
 export function useGlobeUrlState(layers: GlobeLayer[]) {
   const [params, setParams] = useQueryStates(
-    { layer: parseAsString, country: parseAsString },
+    { layer: parseAsString, period: parseAsString, country: parseAsString },
     { history: "replace" },
   );
 
   const layerIndex = useGlobeStore((s) => s.layerIndex);
+  const periodIndex = useGlobeStore((s) => s.periodIndex);
   const selected = useGlobeStore((s) => s.selected);
   const setLayer = useGlobeStore((s) => s.setLayer);
+  const setPeriod = useGlobeStore((s) => s.setPeriod);
   const setSelected = useGlobeStore((s) => s.setSelected);
   const markInteracted = useGlobeStore((s) => s.markInteracted);
 
@@ -37,6 +39,14 @@ export function useGlobeUrlState(layers: GlobeLayer[]) {
 
     const wantedLayer = layers.findIndex((l) => l.layer === params.layer);
     if (wantedLayer >= 0) setLayer(wantedLayer);
+
+    // The period is carried as the label rather than an index, so the link
+    // still means 2019 if a future ingest adds an earlier year.
+    const target0 = wantedLayer >= 0 ? layers[wantedLayer] : layers[0];
+    if (params.period && target0) {
+      const at = target0.periods.indexOf(params.period);
+      if (at >= 0 && at !== target0.periods.length - 1) setPeriod(at);
+    }
 
     const iso3 = params.country?.toUpperCase();
     if (iso3) {
@@ -50,14 +60,39 @@ export function useGlobeUrlState(layers: GlobeLayer[]) {
         markInteracted();
       }
     }
-  }, [layers, params.layer, params.country, setLayer, setSelected, markInteracted]);
+  }, [
+    layers,
+    params.layer,
+    params.period,
+    params.country,
+    setLayer,
+    setPeriod,
+    setSelected,
+    markInteracted,
+  ]);
 
   // --- store -> URL --------------------------------------------------------
   useEffect(() => {
     if (!hydrated.current) return;
-    const layerKey = layers[layerIndex]?.layer ?? null;
-    const nextLayer = layerIndex === 0 ? null : layerKey;
-    if (params.layer === nextLayer && params.country === selected) return;
-    void setParams({ layer: nextLayer, country: selected });
-  }, [layerIndex, selected, layers, params.layer, params.country, setParams]);
+    const layer = layers[layerIndex];
+    const nextLayer = layerIndex === 0 ? null : (layer?.layer ?? null);
+    // -1 means "latest", which is the default and so stays out of the URL.
+    const nextPeriod = periodIndex < 0 ? null : (layer?.periods[periodIndex] ?? null);
+    if (
+      params.layer === nextLayer &&
+      params.period === nextPeriod &&
+      params.country === selected
+    )
+      return;
+    void setParams({ layer: nextLayer, period: nextPeriod, country: selected });
+  }, [
+    layerIndex,
+    periodIndex,
+    selected,
+    layers,
+    params.layer,
+    params.period,
+    params.country,
+    setParams,
+  ]);
 }

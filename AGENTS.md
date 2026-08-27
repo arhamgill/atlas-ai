@@ -93,6 +93,10 @@ and per-model slugs (V3).
 
 ## Architecture
 
+- **The globe is scrubbable through time.** Layer payloads carry `periods` and
+  `rowsByPeriod`; choropleths are painted lazily into a bounded texture cache, and the
+  colour scale spans every period so growth reads as growth. See DECISIONS 007–008
+  before touching `Earth.tsx`.
 - **Metrics are stored tall**, not wide: `metrics(country_iso3, metric_key, period, value)`.
   Adding a globe layer is a row in `metric_defs` plus an ingest source — no migration, no
   component change. The layer switcher reads `metric_defs`.

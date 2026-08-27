@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef } from "react";
 import type { GlobeLayer } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { TimeScrubber } from "./TimeScrubber";
 import { useGlobeStore } from "@/lib/state/globe";
 
 export interface CountryMeta {
@@ -23,6 +24,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function GlobeHud({ layers, countries }: Props) {
   const layerIndex = useGlobeStore((s) => s.layerIndex);
+  const periodIndex = useGlobeStore((s) => s.periodIndex);
   const setLayer = useGlobeStore((s) => s.setLayer);
   const hovered = useGlobeStore((s) => s.hovered);
   const selected = useGlobeStore((s) => s.selected);
@@ -59,15 +61,41 @@ export function GlobeHud({ layers, countries }: Props) {
     [countries],
   );
 
+  /*
+   * The rows for the period currently painted on the globe.
+   *
+   * Only the active layer follows the scrubber — the others keep their latest
+   * figures, because a year selected on investment may not exist on adoption,
+   * and showing an unrelated layer's 2016 value beside a 2016 investment
+   * figure would imply they were chosen together.
+   */
+  const rowsFor = useMemo(
+    () =>
+      layers.map((l, i) => {
+        if (i !== layerIndex || periodIndex < 0) return l.rows;
+        return l.rowsByPeriod[Math.min(periodIndex, l.periods.length - 1)] ?? l.rows;
+      }),
+    [layers, layerIndex, periodIndex],
+  );
+
   /** iso3 -> [value, rank] for every layer, so lookups are O(1) per country. */
   const index = useMemo(
-    () => layers.map((l) => new Map(l.rows.map((r) => [r[0], r]))),
-    [layers],
+    () => rowsFor.map((rows) => new Map(rows.map((r) => [r[0], r]))),
+    [rowsFor],
   );
 
   const active = layers[layerIndex];
   const activeIndex = index[layerIndex];
   if (!active || !activeIndex) return null;
+
+  // What the title, legend and panel should say — the scrubbed period, not
+  // necessarily the newest one.
+  const activePeriod =
+    periodIndex < 0
+      ? active.period
+      : (active.periods[Math.min(periodIndex, active.periods.length - 1)] ??
+        active.period);
+  const activeRows = rowsFor[layerIndex] ?? active.rows;
 
   const hoveredRow = hovered ? activeIndex.get(hovered) : undefined;
   const hoveredMeta = hovered ? nameByIso3.get(hovered) : undefined;
@@ -75,8 +103,9 @@ export function GlobeHud({ layers, countries }: Props) {
 
   return (
     <>
-      {/* ---------- Layer switcher ---------- */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-2 sm:p-6">
+      {/* ---------- Scrubber + layer switcher ---------- */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 p-2 sm:p-6">
+        <TimeScrubber periods={active.periods} layer={active.layer} />
         <div
           role="tablist"
           aria-label="Globe data layer"
@@ -111,7 +140,7 @@ export function GlobeHud({ layers, countries }: Props) {
                   {layer.shortLabel}
                 </span>
                 <span className="numeric text-2xs relative mt-1 block text-[var(--text-tertiary)]">
-                  {layer.rows.length}
+                  {(rowsFor[i] ?? layer.rows).length}
                 </span>
                 <span className="relative mt-1.5 flex h-0.5 w-full overflow-hidden rounded-full">
                   {[1, 2, 3, 4, 5].map((s) => (
@@ -147,7 +176,7 @@ export function GlobeHud({ layers, countries }: Props) {
           </motion.h1>
         </AnimatePresence>
         <p className="numeric mt-1.5 text-xs text-[var(--text-tertiary)]">
-          {formatPeriod(active.period)} · {active.rows.length} countries
+          {formatPeriod(activePeriod)} · {activeRows.length} countries
         </p>
 
         <div className="mt-5 flex items-center gap-2">
@@ -329,7 +358,7 @@ export function GlobeHud({ layers, countries }: Props) {
                           }}
                         />
                         <p className="numeric text-2xs mt-2 text-[var(--text-tertiary)]">
-                          Rank #{row[2]} of {layer.rows.length}
+                          Rank #{row[2]} of {(rowsFor[i] ?? layer.rows).length}
                           {row[3] !== null && row[3] !== 0 && (
                             <span
                               className="ml-2"
@@ -350,7 +379,7 @@ export function GlobeHud({ layers, countries }: Props) {
                     )}
 
                     <p className="numeric text-2xs mt-2 text-[var(--text-tertiary)]">
-                      {formatPeriod(layer.period)}
+                      {formatPeriod(i === layerIndex ? activePeriod : layer.period)}
                     </p>
                   </button>
                 );
