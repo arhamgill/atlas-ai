@@ -3,6 +3,7 @@
 import { scaleLinear, scalePoint } from "d3-scale";
 import { area as d3area, line as d3line, curveMonotoneX } from "d3-shape";
 import { useMemo, useState } from "react";
+import { useInView } from "@/components/ui/useInView";
 import { formatMetric } from "@/lib/metrics/scales";
 import {
   AREA_OPACITY,
@@ -55,6 +56,7 @@ export function TimeSeries({
   showRank?: boolean;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+  const { ref: viewRef, inView } = useInView<HTMLElement>();
   const [width, setWidth] = useState(560);
   const m = DEFAULT_MARGIN;
 
@@ -104,7 +106,7 @@ export function TimeSeries({
   const activePoint = points[active];
 
   return (
-    <figure className="relative m-0">
+    <figure ref={viewRef} className="relative m-0">
       <svg
         viewBox={`0 0 ${width} ${height}`}
         width="100%"
@@ -150,14 +152,33 @@ export function TimeSeries({
             </g>
           ))}
 
-          <path d={areaPath} fill={`url(#fade-${layer}-${label})`} />
+          <path
+            d={areaPath}
+            fill={`url(#fade-${layer}-${label})`}
+            style={{
+              opacity: inView ? 1 : 0,
+              transition: "opacity 600ms var(--ease) 240ms",
+            }}
+          />
+          {/*
+            The line draws itself in by animating a dash offset.
+
+            `pathLength={1}` renormalises the path's own length to 1, so the
+            dash array and offset are the same two numbers for every series
+            regardless of its real geometry — no getTotalLength() call, and so
+            no DOM read during render.
+          */}
           <path
             d={linePath}
+            pathLength={1}
             fill="none"
             stroke={color}
             strokeWidth={STROKE}
             strokeLinecap="round"
             strokeLinejoin="round"
+            strokeDasharray={1}
+            strokeDashoffset={inView ? 0 : 1}
+            style={{ transition: "stroke-dashoffset 900ms var(--ease)" }}
           />
 
           {/* Crosshair for the hovered period. */}
@@ -183,7 +204,10 @@ export function TimeSeries({
                 fill={color}
                 stroke="var(--bg-surface)"
                 strokeWidth={DOT_RING}
-                opacity={isActive ? 1 : 0.85}
+                opacity={inView ? (isActive ? 1 : 0.85) : 0}
+                style={{
+                  transition: `opacity 320ms var(--ease) ${360 + i * 45}ms`,
+                }}
               />
             );
           })}

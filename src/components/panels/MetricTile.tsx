@@ -20,8 +20,12 @@ export function MetricTile({ metric, iso3 }: { metric: CountryMetric; iso3: stri
   return (
     <Link
       href={`/?layer=${metric.layer}&country=${iso3}`}
-      className="group block rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition-colors hover:border-[var(--border-strong)]"
-      style={{ transitionDuration: "var(--dur-ui)" }}
+      className="group block rounded-[var(--radius-lg)] border border-[var(--border-subtle)] p-5 transition-colors hover:border-[var(--border-strong)]"
+      style={{
+        transitionDuration: "var(--dur-ui)",
+        background: l ? "var(--bg-surface)" : "transparent",
+        opacity: l ? 1 : 0.62,
+      }}
     >
       <div className="flex items-center gap-2">
         <span
@@ -78,14 +82,13 @@ export function MetricTile({ metric, iso3 }: { metric: CountryMetric; iso3: stri
           </p>
         </>
       ) : (
-        <>
-          <p className="mt-3 text-[length:var(--text-lg)] text-[var(--no-data-text)]">
-            No data
-          </p>
-          <p className="text-2xs mt-4 leading-relaxed text-[var(--text-tertiary)]">
-            This country is not covered by the source for this layer.
-          </p>
-        </>
+        // Recessive rather than empty. Repeating a full sentence of explanation
+        // in every uncovered card turned two thirds of a sparse country's page
+        // into the same apology twice over; the grid says which layers are
+        // missing once, below.
+        <p className="mt-3 text-[length:var(--text-lg)] text-[var(--no-data-text)]">
+          No data
+        </p>
       )}
     </Link>
   );

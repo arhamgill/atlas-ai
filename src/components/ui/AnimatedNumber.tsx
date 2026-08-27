@@ -1,33 +1,7 @@
 "use client";
 
-import {
-  type CSSProperties,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-
-const QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribe(callback: () => void): () => void {
-  const media = window.matchMedia(QUERY);
-  media.addEventListener("change", callback);
-  return () => media.removeEventListener("change", callback);
-}
-
-/**
- * Reads the motion preference as an external store rather than into state via
- * an effect, so it is correct on the very first render and never causes a
- * cascading re-render.
- */
-function useReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(QUERY).matches,
-    () => false,
-  );
-}
+import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "./useReducedMotion";
 
 /** Matches --ease in tokens.css. */
 function easeOutCubic(t: number): number {

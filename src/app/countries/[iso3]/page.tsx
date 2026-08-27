@@ -5,6 +5,8 @@ import { TimeSeries } from "@/components/charts/TimeSeries";
 import { layerColor } from "@/components/charts/primitives";
 import { CountryLocator } from "@/components/panels/CountryLocator";
 import { MetricTile } from "@/components/panels/MetricTile";
+import { ModelsTable } from "@/components/panels/ModelsTable";
+import { Reveal } from "@/components/ui/Reveal";
 import { getCountriesWithData, getCountryDetail } from "@/lib/db/queries";
 import { formatMetric, formatPeriod } from "@/lib/metrics/scales";
 
@@ -72,6 +74,22 @@ export default async function CountryPage({
       return pa - pb;
     })[0];
 
+  /*
+   * "Strongest on X" is faint praise when X is 94th of 181. The verb has to
+   * match the rank, or the sentence overstates what the data says.
+   */
+  const strongestVerb = (() => {
+    const l = strongest?.latest;
+    if (!l?.rank) return null;
+    const pct = (l.rank - 1) / Math.max(1, l.total - 1);
+    if (l.rank <= 10) return "Leads on";
+    if (pct <= 0.25) return "Strong on";
+    if (pct <= 0.5) return "Ranks best on";
+    return "Ranks highest on";
+  })();
+
+  const uncovered = country.metrics.filter((m) => m.latest === null);
+
   const charts = country.metrics.filter((m) => m.series.length >= 2);
 
   return (
@@ -106,14 +124,14 @@ export default async function CountryPage({
 
           {strongest?.latest && (
             <p className="mt-8 max-w-lg text-[length:var(--text-lg)] leading-snug text-[var(--text-secondary)]">
-              Strongest on{" "}
+              {strongestVerb}{" "}
               <span
                 className="font-medium"
                 style={{ color: layerColor(strongest.layer, 5) }}
               >
                 {strongest.shortLabel.toLowerCase()}
               </span>
-              , where it ranks{" "}
+              {" — "}
               <span className="numeric text-[var(--text-primary)]">
                 #{strongest.latest.rank}
               </span>{" "}
@@ -134,10 +152,19 @@ export default async function CountryPage({
           The four dimensions
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {country.metrics.map((metric) => (
-            <MetricTile key={metric.key} metric={metric} iso3={country.iso3} />
+          {country.metrics.map((metric, i) => (
+            <Reveal key={metric.key} delay={i * 60}>
+              <MetricTile metric={metric} iso3={country.iso3} />
+            </Reveal>
           ))}
         </div>
+        {uncovered.length > 0 && (
+          <p className="text-2xs mt-3 text-[var(--text-tertiary)]">
+            No source covers {country.name} for{" "}
+            {uncovered.map((m) => m.shortLabel.toLowerCase()).join(" or ")}. Shown as no
+            data, never as zero.
+          </p>
+        )}
       </section>
 
       {/* ---------- Time series ----------
@@ -153,36 +180,43 @@ export default async function CountryPage({
             Over time
           </h2>
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            {charts.map((metric) => (
-              <article
-                key={metric.key}
-                className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5"
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-block size-2 rounded-[2px]"
-                    style={{ background: layerColor(metric.layer, 4) }}
-                  />
-                  <h3 className="text-[length:var(--text-sm)] font-medium">
-                    {metric.label}
-                  </h3>
-                </div>
-                <div className="mt-4">
-                  <TimeSeries
-                    points={metric.series}
-                    layer={metric.layer}
-                    unit={metric.unit}
-                    precision={metric.precision}
-                    label={metric.label}
-                    showRank={metric.key !== "development.notable_models"}
-                  />
-                </div>
-                {metric.methodologyNote && (
-                  <p className="text-2xs mt-4 border-t border-[var(--border-subtle)] pt-3 leading-relaxed text-[var(--text-tertiary)]">
-                    {metric.methodologyNote}
-                  </p>
-                )}
-              </article>
+            {charts.map((metric, i) => (
+              <Reveal key={metric.key} delay={i * 70}>
+                <article className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="inline-block size-2 rounded-[2px]"
+                      style={{ background: layerColor(metric.layer, 4) }}
+                    />
+                    <h3 className="text-[length:var(--text-sm)] font-medium">
+                      {metric.label}
+                    </h3>
+                  </div>
+                  <div className="mt-4">
+                    <TimeSeries
+                      points={metric.series}
+                      layer={metric.layer}
+                      unit={metric.unit}
+                      precision={metric.precision}
+                      label={metric.label}
+                      showRank={metric.key !== "development.notable_models"}
+                    />
+                  </div>
+                  {metric.methodologyNote && (
+                    /* Native <details>: no JS, keyboard-operable and findable by
+                     in-page search even while collapsed. These notes ran four
+                     lines and were routinely taller than the chart above them. */
+                    <details className="mt-4 border-t border-[var(--border-subtle)] pt-3">
+                      <summary className="text-2xs cursor-pointer list-none tracking-[0.14em] text-[var(--text-tertiary)] uppercase transition-colors hover:text-[var(--text-secondary)]">
+                        Method &amp; caveats
+                      </summary>
+                      <p className="text-2xs mt-2.5 leading-relaxed text-[var(--text-tertiary)]">
+                        {metric.methodologyNote}
+                      </p>
+                    </details>
+                  )}
+                </article>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -204,58 +238,7 @@ export default async function CountryPage({
             </span>
           </div>
 
-          <div className="mt-4 overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--border-subtle)]">
-            <table className="w-full min-w-[560px] border-collapse text-left">
-              <thead>
-                <tr className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                  <th className="text-2xs px-4 py-2.5 font-normal tracking-[0.14em] text-[var(--text-tertiary)] uppercase">
-                    Model
-                  </th>
-                  <th className="text-2xs px-4 py-2.5 font-normal tracking-[0.14em] text-[var(--text-tertiary)] uppercase">
-                    Organization
-                  </th>
-                  <th className="text-2xs px-4 py-2.5 font-normal tracking-[0.14em] text-[var(--text-tertiary)] uppercase">
-                    Domain
-                  </th>
-                  <th className="text-2xs px-4 py-2.5 text-right font-normal tracking-[0.14em] text-[var(--text-tertiary)] uppercase">
-                    Published
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {country.models.map((model) => (
-                  <tr
-                    key={model.id}
-                    className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--bg-surface)]"
-                  >
-                    <td className="px-4 py-2.5 text-sm text-[var(--text-primary)]">
-                      {model.link ? (
-                        <a
-                          href={model.link}
-                          rel="noreferrer noopener"
-                          target="_blank"
-                          className="underline-offset-4 hover:text-[var(--accent)] hover:underline"
-                        >
-                          {model.name}
-                        </a>
-                      ) : (
-                        model.name
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5 text-sm text-[var(--text-secondary)]">
-                      {model.organization ?? "—"}
-                    </td>
-                    <td className="px-4 py-2.5 text-sm text-[var(--text-tertiary)]">
-                      {model.domain ?? "—"}
-                    </td>
-                    <td className="numeric px-4 py-2.5 text-right text-sm text-[var(--text-secondary)]">
-                      {model.publicationDate ?? "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ModelsTable models={country.models} total={country.modelCount} />
         </section>
       )}
 
