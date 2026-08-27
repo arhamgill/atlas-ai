@@ -714,3 +714,33 @@ export async function getCountryTable(): Promise<CountryTable> {
     layers,
   };
 }
+
+/* ---------------------------------------------------------------------------
+ * Search index
+ * ------------------------------------------------------------------------- */
+
+export interface SearchEntry {
+  iso3: string;
+  name: string;
+  region: string | null;
+}
+
+/**
+ * Every country that has a page, as a flat list for the command palette.
+ *
+ * Deliberately tiny — under 200 rows of three short fields — so it can be
+ * embedded in the shared layout and searched entirely on the client. A search
+ * that round-trips per keystroke never feels instant.
+ */
+export async function getSearchIndex(): Promise<SearchEntry[]> {
+  const rows = await db
+    .selectDistinct({
+      iso3: metrics.countryIso3,
+      name: countries.name,
+      region: countries.region,
+    })
+    .from(metrics)
+    .innerJoin(countries, eq(countries.iso3, metrics.countryIso3))
+    .orderBy(countries.name);
+  return rows.map((r) => ({ ...r, iso3: r.iso3.trim() }));
+}

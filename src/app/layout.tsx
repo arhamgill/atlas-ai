@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { CommandPalette } from "@/components/ui/CommandPalette";
 import { SiteNav } from "@/components/ui/SiteNav";
+import { getSearchIndex } from "@/lib/db/queries";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -31,7 +33,12 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Under 10 KB for every country that has a page, so the palette can search
+  // entirely on the client — a search that round-trips per keystroke never
+  // feels instant.
+  const searchIndex = await getSearchIndex();
+
   return (
     <html
       lang="en"
@@ -40,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="grain flex min-h-full flex-col">
         <NuqsAdapter>
           <SiteNav />
+          <CommandPalette countries={searchIndex} />
           {children}
         </NuqsAdapter>
       </body>

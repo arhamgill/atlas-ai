@@ -36,6 +36,20 @@ export function SiteNav() {
         </Link>
 
         <ul className="pointer-events-auto flex items-center gap-1 sm:gap-2">
+          <li className="mr-1 hidden sm:block">
+            <button
+              onClick={() =>
+                window.dispatchEvent(
+                  new KeyboardEvent("keydown", { key: "k", metaKey: true }),
+                )
+              }
+              aria-label="Open search"
+              className="text-2xs flex items-center gap-2 rounded-[var(--radius)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-[var(--text-tertiary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)]"
+            >
+              <span aria-hidden>⌕</span>
+              <kbd className="numeric text-[10px]">⌘K</kbd>
+            </button>
+          </li>
           {LINKS.map((link) => {
             const active =
               link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
